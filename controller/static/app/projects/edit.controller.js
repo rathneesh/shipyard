@@ -104,6 +104,7 @@
         vm.cancelEditSaveImage = cancelEditSaveImage;
         vm.enableSaveProject = enableSaveProject;
         vm.isProjectBuilt = isProjectBuilt;
+        vm.getDockerHubTags = getDockerHubTags;
 
         vm.getRegistries();
         vm.getImages(vm.project.id);
@@ -261,64 +262,51 @@
             });
         $('.ui.search').search({
             apiSettings: {
-                url: '/api/v1/search?q={query}',
+                url: '/api/v2/search?q={query}',
                 beforeXHR: function(xhr) {
                     xhr.setRequestHeader('X-Access-Token', localStorage.getItem('X-Access-Token'))
                 },
                 // Little hack to get title to show up (some of the docs don't apply to our version of semantic)
                 successTest: function(response) {
-                    $.each(response.results, function(index,item) {
-                        response.results[index].title = response.results[index].name;
-                    });
+                    vm.createImageTagSpin = true;
+                    if (response.user === "library"){
+                       vm.createImage.name  = response.name;
+                    }
+                    else{
+                       vm.createImage.name = response.user + "/" + response.name;
+                    }
+                    vm.createImage.description = response.description;
+                    vm.createImage.tag = "";
+                    vm.buttonStyle = "disabled";
+                    $('.ui.selection.fluid.dropdown.tag.create').dropdown('restore defaults');
                     return true;
                 }
             },
-            onSelect: function(result,response) {
-                vm.createImageTagSpin = true;
-                vm.createImage.name = result.title;
-                vm.createImage.description = result.description;
-                vm.createImage.tag = "";
-                vm.buttonStyle = "disabled";
-                $('.ui.selection.fluid.dropdown.tag.create').dropdown('restore defaults');
-                ProjectService.getPublicRegistryTags(result.name)
-                    .then(function(data) {
-                        vm.publicRegistryTags = data;
-                        vm.createImageTagSpin = false;
-                    }, function(data) {
-                        vm.error = data;
-                    });
-            },
+
             minCharacters: 3
         });
         $('.ui.search.edit').search({
             apiSettings: {
-                url: '/api/v1/search?q={query}',
+                url: '/api/v2/search?q={query}',
                 beforeXHR: function(xhr) {
                     xhr.setRequestHeader('X-Access-Token', localStorage.getItem('X-Access-Token'))
                 },
                 // Little hack to get title to show up (some of the docs don't apply to our version of semantic)
                 successTest: function(response) {
-                    $.each(response.results, function(index,item) {
-                        response.results[index].title = response.results[index].name;
-                    });
+                    vm.editImageTagSpin = true;
+                    if (response.user === "library"){
+                       vm.createImage.name  = response.name;
+                    }
+                    else{
+                       vm.createImage.name = response.user + "/" + response.name;
+                    }
+                    vm.editImage.description = response.description;
+                    vm.editImage.tag = "";
+                    vm.buttonStyle = "disabled";
+                    $('.ui.selection.fluid.dropdown.edit.tag').dropdown('restore defaults');
+                    vm.publicRegistryTags = "";
                     return true;
                 }
-            },
-            onSelect: function(result,response) {
-                vm.editImageTagSpin = true;
-                vm.editImage.name = result.title;
-                vm.editImage.description = result.description;
-                vm.editImage.tag = "";
-                vm.buttonStyle = "disabled";
-                vm.publicRegistryTags = "";
-                $('.ui.selection.fluid.dropdown.edit.tag').dropdown('restore defaults');
-                ProjectService.getPublicRegistryTags(result.name)
-                    .then(function(data) {
-                        vm.publicRegistryTags = data;
-                        vm.editImageTagSpin = false;
-                    }, function(data) {
-                        vm.error = data;
-                    });
             },
             minCharacters: 3
         });
@@ -354,7 +342,15 @@
                 createSelectizeObj = selectize;
             }
         };
-
+        function getDockerHubTags(image){
+             ProjectService.getPublicRegistryTags(image)
+                                .then(function(data) {
+                                    vm.publicRegistryTags = data.tags;
+                                    vm.createImageTagSpin = false;
+                                }, function(data) {
+                                    vm.error = data;
+                                });
+        }
         function showTestCreateDialog() {
             vm.createTest = {};
             vm.createTest.tagging = {};
@@ -531,10 +527,11 @@
             $('#editImageTagDefault').html(image.tag);
             $scope.$apply();
             if(image.location === "Public Registry") {
+                getDockerHubTags(image.name);
                 ProjectService.getPublicRegistryTags(image.name)
                     .then(function(data) {
                         var tagObject = $.grep(data, function (tag) {
-                            return tag.name == image.tag;
+                            return tag == image.tag;
                         })[0];
 
                         if (tagObject && tagObject.hasOwnProperty('layer')) {
@@ -695,7 +692,7 @@
             vm.buttonStyle = "disabled";
             console.log(" check image " + imageData.name + " with tag " + imageData.tag);
             angular.forEach(vm.publicRegistryTags, function (tag) {
-                if(tag.name == imageData.tag) { // Type converting equality since tags may be integers (1) or strings (latest)
+                if(tag == imageData.tag) { // Type converting equality since tags may be integers (1) or strings (latest)
                     vm.buttonStyle = "positive";
                 }
             });

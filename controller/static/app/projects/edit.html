@@ -48,7 +48,7 @@
                     <div class="ui form" ng-submit="vm.deploy()">
                         <div ng-show="vm.createImage.location === 'Public Registry' && (!vm.createImage.name || !vm.createImage.tag)" class="ui info message">
                             <ul class="list">
-                                <li ng-show="!vm.createImage.name">Choose an Image from the dropdown.</li>
+                                <li ng-show="!vm.createImage.name">Input image name.</li>
                                 <li ng-show="!vm.createImage.tag">Choose Tag from the dropdown.</li>
                             </ul>
                         </div>
@@ -112,10 +112,9 @@
                                         <label>Image Name </label>
                                         <div class="ui search">
                                             <div class="ui icon input">
-                                                <input id="create-image-name-search" class="prompt" type="text" placeholder="Name" />
+                                                <input ng-blur="vm.getDockerHubTags(vm.createImage.name)" id="create-image-name-search" class="prompt" type="text" placeholder="Name" />
                                                 <i class="search icon"></i>
                                             </div>
-                                            <div class="results"></div>
                                         </div>
                                     </div>
                                     <div ng-show="vm.createImage.location === 'Public Registry'" class="four wide field">
@@ -127,7 +126,7 @@
                                             <div class="default text">Tag</div>
                                             <div class="menu">
                                                 <div ng-repeat="a in vm.publicRegistryTags" id="tag-results"
-                                                     class="item" data-value="{{a.name}}">{{a.name}}</div>
+                                                     class="item" data-value="{{a}}">{{a}}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -281,10 +280,9 @@
                                         <label>Image Name </label>
                                         <div class="ui search edit">
                                             <div class="ui icon input">
-                                                <input class="prompt editImageName" type="text" placeholder="{{vm.editImage.name}}" ng-model="vm.editImage.name"/>
+                                                <input ng-blur="vm.getDockerHubTags(vm.editImage.name)" class="prompt editImageName" type="text" placeholder="{{vm.editImage.name}}" ng-model="vm.editImage.name"/>
                                                 <i class="search icon"></i>
                                             </div>
-                                            <div class="results"></div>
                                         </div>
                                     </div>
                                     <div id="edit-image-tag" ng-show="vm.editImage.location === 'Public Registry'" class="four wide field">
@@ -296,7 +294,7 @@
                                             <div id="editImageTagDefault" class="default text"></div>
                                             <div class="menu">
                                                 <div id="edit-image-tag-results" ng-repeat="a in vm.publicRegistryTags"
-                                                     class="item" data-value="{{a.name}}">{{a.name}}</div>
+                                                     class="item" data-value="{{a}}">{{a}}</div>
                                             </div>
                                         </div>
                                     </div>
