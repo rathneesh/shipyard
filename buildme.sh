@@ -13,6 +13,7 @@ COMPOSE_FILE=${COMPOSE_FILE:-"docker-compose.yml"}
 RETHINK_IMAGE=${RETHINK_IMAGE:-rethinkdb:2.3}
 DOCKERPROXY_IMAGE=${DOCKERPROXY_IMAGE:-ehazlett/docker-proxy:latest}
 ILM_DEBUG=${ILM_DEBUG:-""}
+ILM_IGNORE_TEARDOWN_ERROR=${ILM_DEBUG:-0}
 # For ILM tests only
 # Supply rethinkdb data folder, if needed
 RETHINKDB_DATA_FOLDER=${RETHINKDB_DATA_FOLDER:-""}
@@ -215,7 +216,7 @@ function DEPLOY_TEARDOWN() {
     docker-compose -f $COMPOSE_FILE down
     result=$?
 
-    if [ $result -ne 0 ]; then
+    if [ $result -ne 0 ] && [ $ILM_IGNORE_TEARDOWN_ERROR == 0 ] ; then
         echo "    Error: Could not teardown ILM."
         exit $result
     fi
@@ -236,12 +237,14 @@ case "$1" in
         ;;
     deploy)
         SET_ILM_PROXY_SETTING
+        ILM_IGNORE_TEARDOWN_ERROR=1 # it does not matter if ILM was not deployed as we are deploying now
         DEPLOY_TEARDOWN
         UPDATE_COMPOSE_FILE
         DEPLOY_COMPOSE
         ;;
     all)
         SET_ILM_PROXY_SETTING
+        ILM_IGNORE_TEARDOWN_ERROR=1 # it does not matter if ILM was not deployed as we are deploying now
         DEPLOY_TEARDOWN
         ILM_BUILD
         CREATE_IMAGE
