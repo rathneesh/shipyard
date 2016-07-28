@@ -10,7 +10,7 @@ sudo docker run \
     --rm \
     -v /dev/shm:/dev/shm \
     -v $(pwd):/protractor \
-    --name ilmtestui_protractor
+    --name ilmtestui_protractor \
     webnicer/protractor-headless conf.js
 result=$?
 
