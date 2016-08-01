@@ -8,7 +8,6 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/context"
-	"github.com/gorilla/mux"
 	"github.com/mailgun/oxy/forward"
 	"github.com/shipyard/shipyard/controller/manager"
 	"github.com/shipyard/shipyard/controller/middleware/access"
@@ -18,6 +17,7 @@ import (
 	"github.com/shipyard/shipyard/utils/tlsutils"
 	"github.com/shipyard/shipyard/utils/emitter"
 	"golang.org/x/net/websocket"
+	"github.com/gorilla/mux"
 )
 
 type (
@@ -191,8 +191,8 @@ func (a *Api) Setup() (*http.ServeMux, error) {
 	apiRouter.HandleFunc("/api/providers/{providerId}/jobs", a.addJobToProviderId).Methods("POST")
 
 	//Public Registry Proxy
-	apiRouter.HandleFunc("/api/v1/search", a.dockerhubSearch).Methods("GET")
-	apiRouter.HandleFunc("/api/v1/repositories/tags", a.dockerhubTags).Methods("GET")
+	apiRouter.HandleFunc("/api/v2/search", a.dockerhubSearch).Methods("GET")
+	apiRouter.HandleFunc("/api/v2/tags", a.dockerhubTags).Methods("GET")
 
 	apiRouter.HandleFunc("/api/roles", a.roles).Methods("GET")
 	apiRouter.HandleFunc("/api/nodes", a.nodes).Methods("GET")
@@ -364,6 +364,7 @@ func (a *Api) Setup() (*http.ServeMux, error) {
 	globalMux.Handle("/v1.21/", swarmAuthRouter)
 	globalMux.Handle("/v1.22/", swarmAuthRouter)
 	globalMux.Handle("/v1.23/", swarmAuthRouter)
+	globalMux.Handle("/v1.24/", swarmAuthRouter)
 
 	// check for admin user
 	if _, err := controllerManager.Account("admin"); err == manager.ErrAccountDoesNotExist {
