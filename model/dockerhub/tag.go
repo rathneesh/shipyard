@@ -6,5 +6,5 @@ type Tag struct {
 }
 type TagV2 struct {
 	Name string `json:"name"`
-	Tags string `json:"tags"`
+	Tags []string `json:"tags"`
 }
