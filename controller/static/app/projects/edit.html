@@ -156,7 +156,7 @@
                                     <div></div>
                                 </div>
 
-                                <div ng-show="vm.createImage.location && vm.createImage.location != 'File'" class="field">
+                                <div ng-show="vm.createImage.location && vm.createImage.location != 'File' && vm.createImage.location != 'Public Registry'" class="field">
                                     <label>Additional Image Tag <i class="blue help circle icon"></i>
                                         <div class="ui popup" style="max-width: 450px;">
                                             <h5>Additional Image Tag</h5>
@@ -167,9 +167,9 @@
                                     <i ng-show="vm.createImage.location === 'Shipyard Registry' && vm.createImage.tag" class="ui label" ng-repeat="a in vm.shipyardImages | filter: { name: vm.createImage.name }">
                                         {{a.tag}}
                                     </i>
-                                    <i ng-show="vm.createImage.location === 'Public Registry' && vm.createImage.tag" class="ui label" ng-repeat="a in vm.publicRegistryTags | filter: { layer: vm.createImage.tagLayer }">
+                               <!--     <i ng-show="vm.createImage.location === 'Public Registry' && vm.createImage.tag" class="ui label" ng-repeat="a in vm.publicRegistryTags | filter: { layer: vm.createImage.tagLayer }">
                                         {{a.name}}
-                                    </i>
+                                    </i>-->
                                 </div>
 
                                 <div ng-show="vm.createImage.location ==='File'" class="two fields">
@@ -335,7 +335,7 @@
                                     <div></div>
                                 </div>
 
-                                <div ng-show="vm.editImage.location && vm.editImage.location != 'File'" class="field">
+                                <div ng-show="vm.editImage.location && vm.editImage.location != 'File' && vm.editImage.location != 'Public Registry'" class="field">
                                     <label>Additional Image Tag <i class="blue help circle icon"></i>
                                         <div class="ui popup" style="max-width: 450px;">
                                             <h5>Additional Image Tag</h5>
@@ -346,9 +346,9 @@
                                     <i ng-show="vm.editImage.location === 'Shipyard Registry' && vm.editImage.tag" class="ui label" ng-repeat="a in vm.images | filter: { name: vm.editImage.name }">
                                         {{a.tag}}
                                     </i>
-                                    <i ng-show="vm.editImage.location === 'Public Registry' && vm.editImage.tag" class="ui label" ng-repeat="a in vm.editImage.additionalTags">
+                                    <!--<i ng-show="vm.editImage.location === 'Public Registry' && vm.editImage.tag" class="ui label" ng-repeat="a in vm.editImage.additionalTags">
                                         {{a}}
-                                    </i>
+                                    </i>-->
                                 </div>
 
                                 <div ng-show="vm.editImage.location ==='File'" class="two fields">
