@@ -112,14 +112,14 @@ func TestDockerhubSearchImageTags(t *testing.T) {
 
 		Convey("When we make a request to retrieve the tags of the image `docker`", func() {
 			results, code, err := apiClient.DockerHubSearchImageTags(SY_AUTHTOKEN, ts.URL, "docker")
+			fmt.Printf("\nGot %v, %d, %s\n", results, code, err)
 			Convey("Then the server should return OK", func() {
 				So(err, ShouldBeNil)
+
 				So(code, ShouldEqual, http.StatusOK)
 				Convey("Then the first tag should be valid", func() {
-					So(results[0].Name, ShouldNotBeNil)
-					So(results[0].Name, ShouldNotBeEmpty)
-					So(results[0].Layer, ShouldNotBeNil)
-					So(results[0].Layer, ShouldNotBeEmpty)
+					So(results, ShouldNotBeNil)
+					So(results, ShouldNotBeEmpty)
 				})
 			})
 

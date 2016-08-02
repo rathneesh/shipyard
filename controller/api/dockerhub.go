@@ -12,7 +12,7 @@ import (
 
 func getDockerHubToken(imageName string ) string {
 	jsonToken := model.DockerHubV2Token{}
-	response, err := http.Get("https://auth.docker.io/token?service=registry.docker.io&scope=repository:" + imageName + ":pull")
+	response, err := http.Get("https://auth.docker.io/token?service=registry.docker.io&scope=repository:" + imageName + ":push,pull")
 	if err != nil {
 		return string(err.Error())
 	}
@@ -70,15 +70,16 @@ func (a *Api) dockerhubTags(w http.ResponseWriter, r *http.Request) {
 	req.Header.Set("Authorization", header)
 	res, err := client.Do(req)
 	if err != nil {
-		http.Error(w, err.Error(), res.StatusCode)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer res.Body.Close()
 
 	contents, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		http.Error(w, err.Error(), res.StatusCode)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	w.WriteHeader(http.StatusOK)
 	w.Write(contents)
 }
