@@ -237,17 +237,16 @@ describe('ILM', function() {
         element(sy.createImageLocationPublicReg).click();
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.createImageNameSearch), 60000));
         element(sy.createImageNameSearch).click();
-        browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.createImageNameSearch), 60000));
         element(sy.createImageNameSearch).sendKeys(config.imageName);
+        /* the lines below can be used for testing the search for an image which is not implemented in v2 yet
         browser.wait(protractor.until.elementLocated(by.className('description')), 180000);
         browser.wait(protractor.ExpectedConditions.visibilityOf(element.all(by.className('description')).get(0), 60000));
-        element.all(by.className('description')).get(0).click();
+        element.all(by.className('description')).get(0).click(); */
+        browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.createImageTag), 60000));
         element(sy.createImageTag).click();
-        browser.wait(protractor.until.elementLocated(by.id('tag-results')), 180000);
-        browser.wait(protractor.ExpectedConditions.visibilityOf(element.all(by.id('tag-results')).get(0), 60000));
+        browser.wait(protractor.ExpectedConditions.visibilityOf(element.all(by.id('tag-results')).get(0) , 60000));
         element.all(by.id('tag-results')).get(0).click();
         element(sy.createImageDescription).sendKeys('image description');
-        browser.wait(protractor.until.elementLocated(sy.createImageSave), 180000);
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.createImageSave), 60000));
         element(sy.createImageSave).click();
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.createImageList.row(0)), 60000));
