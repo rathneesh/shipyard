@@ -328,10 +328,10 @@
                 successTest: function(response) {
                     vm.editImageTagSpin = true;
                     if (response.user === "library"){
-                       vm.createImage.name  = response.name;
+                       vm.editImage.name  = response.name;
                     }
                     else{
-                       vm.createImage.name = response.user + "/" + response.name;
+                       vm.editImage.name = response.user + "/" + response.name;
                     }
                     vm.editImage.description = response.description;
                     vm.editImage.tag = "";
@@ -377,12 +377,12 @@
         };
         function getDockerHubTags(image){
              ProjectService.getPublicRegistryTags(image)
-                                .then(function(data) {
-                                    vm.publicRegistryTags = data.tags;
-                                    vm.createImageTagSpin = false;
-                                }, function(data) {
-                                    vm.error = data;
-                                });
+                 .then(function(data) {
+                     vm.publicRegistryTags = data.tags;
+                     vm.createImageTagSpin = false;
+                 }, function(data) {
+                     vm.error = data;
+                 });
         }
         function showTestCreateDialog() {
             vm.createTest = {};

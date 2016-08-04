@@ -112,7 +112,7 @@
                                         <label>Image Name </label>
                                         <div class="ui search">
                                             <div class="ui icon input">
-                                                <input ng-blur="vm.getDockerHubTags(vm.createImage.name)" id="create-image-name-search" class="prompt" type="text" placeholder="Name" />
+                                                <input ng-blur="vm.getDockerHubTags(vm.createImage.name)" id="create-image-name-search" class="prompt" type="text" placeholder="Name" ng-model="vm.createImage.name" />
                                                 <i class="search icon"></i>
                                             </div>
                                         </div>
@@ -124,7 +124,7 @@
                                             <i ng-if="!vm.createImageTagSpin" class="dropdown icon"></i>
                                             <i ng-if="vm.createImageTagSpin" class="repeat icon spin" aria-hidden="true" style="float: right; position: relative; width: auto; font-size: 0.85714286; margin: 0em 0em 0em 1em;"></i>
                                             <div class="default text">Tag</div>
-                                            <div class="menu">
+                                            <div class="menu" id="tag-menu">
                                                 <div ng-repeat="a in vm.publicRegistryTags" id="tag-results"
                                                      class="item" data-value="{{a}}">{{a}}</div>
                                             </div>
