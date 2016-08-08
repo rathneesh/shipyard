@@ -1,4 +1,4 @@
-<div id="edit-project-delete-image-modal" class="ui small modal transition">
+<div id="edit-project-delete-image-modal-{{vm.deleteImageId}}" class="ui small modal transition">
     <i class="close icon"></i>
     <div id="delete-image-header" class="header">
         Delete Image: {{ vm.selectedImage.name }}
@@ -17,7 +17,7 @@
     </div>
 </div>
 
-<div id="edit-project-delete-test-modal" class="ui small modal transition">
+<div id="edit-project-delete-test-modal-{{vm.deleteTestId}}" class="ui small modal transition">
     <i class="close icon"></i>
     <div id="delete-test-header" class="header">
         Delete Test: {{ vm.selectedTest.name }}

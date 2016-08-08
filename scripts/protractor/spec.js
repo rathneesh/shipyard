@@ -482,7 +482,9 @@ describe('ILM', function() {
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.createImageList.row(0)), 60000));
         var imageDetails = element(sy.createImageList.row(0));
         imageDetails.element(by.css('i[class="trash icon"]')).click();
+        browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.deleteImageHeader), 60000));
         expect(element(sy.deleteImageHeader).getText()).toEqual("Delete Image: "+config.imageName);
+        browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.deleteImageButton), 60000));
         element(sy.deleteImageButton).click();
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.editProjectHeader), 60000));
         expect(element(sy.createImageList.row(0)).isPresent()).toBeFalsy();
@@ -494,6 +496,7 @@ describe('ILM', function() {
         var testDetails = element(sy.editProjectList.row(0));
         testDetails.element(by.css('i[class="trash icon"]')).click();
         expect(element(sy.deleteTestHeader).getText()).toEqual("Delete Test: "+config.testNameEdit);
+        browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.deleteTestButton), 60000));
         element(sy.deleteTestButton).click();
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.editProjectHeader), 60000));
         expect(element(sy.editProjectList.row(0)).isPresent()).toBeFalsy();
@@ -506,7 +509,7 @@ describe('ILM', function() {
         var deleteProject = element(sy.projectListTableOfProjects.row(0));
         deleteProject.element(by.className('wrench icon')).click();
         browser.wait(protractor.ExpectedConditions.visibilityOf(deleteProject.element(by.css('i[class="black trash icon"]'))), 60000);
-        deleteProject.element(by.css('i[class="black trash icon"]')).click();
+        deleteProject.element(by.id('delete-project-icon')).click();
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.deleteProjectHeader), 60000));
         element(sy.deleteProjectButton).click();
         expect(element(sy.editProjectList.row(0)).isPresent()).toBeFalsy();
