@@ -115,6 +115,8 @@
         vm.randomEditId = null;
         vm.randomCreateTestId = null;
         vm.randomEditTestId = null;
+        vm.deleteImageId =  null;
+        vm.deleteTestId = null;
 
         function makeId() {
             var text = "";
@@ -616,12 +618,16 @@
 
         function showDeleteImageDialog(image) {
             vm.selectedImage = image;
-            $('#edit-project-delete-image-modal').modal('show');
+            vm.deleteImageId = vm.selectedImage.id;
+            $scope.$apply();
+            $('#edit-project-delete-image-modal-'+vm.deleteImageId).modal('show');
         }
 
         function showDeleteTestDialog(test) {
             vm.selectedTest = test;
-            $('#edit-project-delete-test-modal').modal('show');
+            vm.deleteTestId = vm.selectedTest.id;
+            $scope.$apply();
+            $('#edit-project-delete-test-modal-'+vm.deleteTestId).modal('show');
         }
 
         function deleteImage(image) {
