@@ -11,7 +11,6 @@ type Image struct {
 	RegistryDomain string   `json:"-" gorethink:"registryDomain"`
 	Location       string   `json:"location" gorethink:"location"`
 	SkipImageBuild bool     `json:"skipImageBuild" gorethink:"skipImageBuild"`
-	ProjectId      string   `json:"projectId" gorethink:"projectId"`
 }
 
 func NewImage(
@@ -23,7 +22,6 @@ func NewImage(
 	registryId string,
 	location string,
 	skipImageBuild bool,
-	projectId string,
 ) *Image {
 
 	image := new(Image)
@@ -35,7 +33,6 @@ func NewImage(
 	image.RegistryId = registryId
 	image.Location = location
 	image.SkipImageBuild = skipImageBuild
-	image.ProjectId = projectId
 
 	return image
 }

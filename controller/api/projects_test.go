@@ -142,7 +142,7 @@ func TestCreateNewProject(t *testing.T) {
 		So(SY_AUTHTOKEN, ShouldNotBeNil)
 		So(SY_AUTHTOKEN, ShouldNotBeEmpty)
 		Convey("When we make a request to create a new project", func() {
-			id, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, PROJECT1_NAME, PROJECT1_DESC, PROJECT1_STATUS, nil, nil, false)
+			id, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, PROJECT1_NAME, PROJECT1_DESC, PROJECT1_STATUS, nil, nil, nil, nil, false)
 			Convey("Then we get back a successful response", func() {
 				So(id, ShouldNotBeEmpty)
 				So(err, ShouldBeNil)
@@ -184,7 +184,7 @@ func TestGetAllProjects(t *testing.T) {
 		So(SY_AUTHTOKEN, ShouldNotBeNil)
 		So(SY_AUTHTOKEN, ShouldNotBeEmpty)
 		//So(PROJECT1_ID, ShouldNotBeEmpty)
-		id, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, PROJECT2_NAME, PROJECT2_DESC, PROJECT2_STATUS, nil, nil, false)
+		id, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, PROJECT2_NAME, PROJECT2_DESC, PROJECT2_STATUS, nil, nil, nil, nil, false)
 		So(err, ShouldBeNil)
 		So(id, ShouldNotBeEmpty)
 		So(code, ShouldEqual, http.StatusCreated)
@@ -231,7 +231,7 @@ func TestUpdateProject(t *testing.T) {
 	Convey("Given that we have a project created already.", t, func() {
 		Convey("When we request to update that project.", func() {
 			code, err := apiClient.UpdateProject(SY_AUTHTOKEN, ts.URL, PROJECT1_SAVED_ID, PROJECT1_NAME2, PROJECT1_DESC2,
-				PROJECT1_STATUS2, nil, nil, true)
+				PROJECT1_STATUS2, nil, nil, nil, nil, true)
 			Convey("Then we get an appropriate response back", func() {
 				So(err, ShouldBeNil)
 				So(code, ShouldEqual, http.StatusNoContent)
@@ -343,8 +343,7 @@ func TestUnauthorizedProjectRequests(t *testing.T) {
 	})
 	Convey("Given that we have an empty token", t, func() {
 		Convey("When we request to create a new project", func() {
-			id, code, err := apiClient.CreateProject("", ts.URL, PROJECT3_NAME, PROJECT3_DESC, PROJECT3_STATUS, nil, nil,
-				false)
+			id, code, err := apiClient.CreateProject("", ts.URL, PROJECT3_NAME, PROJECT3_DESC, PROJECT3_STATUS, nil, nil, nil, nil, false)
 			Convey("Then we should be denied access", func() {
 				So(err, ShouldNotBeNil)
 				So(code, ShouldEqual, http.StatusUnauthorized)
@@ -358,7 +357,7 @@ func TestUnauthorizedProjectRequests(t *testing.T) {
 
 func TestAddProjectImage(t *testing.T) {
 	Convey("Given that we create a new project", t, func() {
-		projectId, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, PROJECT3_NAME, PROJECT3_DESC, PROJECT3_STATUS, nil, nil, false)
+		projectId, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, PROJECT3_NAME, PROJECT3_DESC, PROJECT3_STATUS, nil, nil, nil, nil, false)
 		So(projectId, ShouldNotBeEmpty)
 		So(code, ShouldEqual, http.StatusCreated)
 		So(err, ShouldBeNil)
@@ -399,7 +398,6 @@ func TestAddProjectImage(t *testing.T) {
 	})
 }
 
-
 func TestAddProjectTest(t *testing.T) {
 	Convey("When we add a new test to it", t, func() {
 		id, code, err := apiClient.CreateTest(
@@ -409,7 +407,7 @@ func TestAddProjectTest(t *testing.T) {
 			"description",
 			[]*model.TargetArtifact{
 				&model.TargetArtifact{
-					ID: IMAGE_ID,
+					ID:           IMAGE_ID,
 					ArtifactType: "image",
 				},
 			},
@@ -441,6 +439,38 @@ func TestAddProjectTest(t *testing.T) {
 }
 
 func TestExecuteProject(t *testing.T) {
+
+	Convey("When we make a request to create a new project", t, func() {
+		id, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, PROJECT1_NAME, PROJECT1_DESC, PROJECT1_STATUS, nil, nil, nil, nil, false)
+		Convey("Then we get back a successful response", func() {
+			So(id, ShouldNotBeEmpty)
+			So(err, ShouldBeNil)
+			So(code, ShouldEqual, http.StatusCreated)
+			PROJECT_TO_RUN = id
+		})
+	})
+
+	Convey("When we make a request to create a new image", t, func() {
+		id, err := apiClient.CreateImage(SY_AUTHTOKEN, ts.URL, PROJECT_TO_RUN, "alpine", "id1", "latest", []string{}, "description", "public registry", "public registry", true)
+		Convey("Then we get back a successful response", func() {
+			So(err, ShouldBeNil)
+			So(id, ShouldNotBeEmpty)
+			IMAGE_SAVED_ID = id
+		})
+	})
+
+	Convey("When we make a request to create a new test", t, func() {
+
+		id, code, err := apiClient.CreateTest(SY_AUTHTOKEN, ts.URL, TEST1_NAME, TEST1_DESC, TEST_ARTIFACTS, TEST1_TYPE, "provider type", "provider name", "provider test", PROJECT_TO_RUN, []*model.Parameter{}, "success tag", "fail tag", "from tag")
+
+		Convey("Then we get back a successful response", func() {
+			So(err, ShouldBeNil)
+			So(code, ShouldEqual, http.StatusCreated)
+			So(id, ShouldNotBeEmpty)
+			TEST_ID = id
+		})
+	})
+
 	Convey("Given that we execute the project we just created", t, func() {
 		status, err := apiClient.RunProject(SY_AUTHTOKEN, ts.URL, PROJECT_TO_RUN)
 		So(status, ShouldEqual, http.StatusCreated)
@@ -480,20 +510,20 @@ func TestAddProjectImageViaUpdate(t *testing.T) {
 		So(err, ShouldBeNil)
 		So(project, ShouldNotBeNil)
 		So(code, ShouldEqual, http.StatusOK)
-		Convey("When we add a new image in the project structure and request an update", func() {
-			newImage := model.NewImage(
-				IMAGE2_NAME,
-				"",
-				IMAGE2_TAG,
-				[]string{"latest", "awesomeTag"},
-				IMAGE2_DESC,
-				"myAmazingRegistryId1232323123",
-				IMAGE2_LOCATION,
-				true,
-				"",
-			)
-			project.Images = append(project.Images, newImage)
-			code, err := apiClient.UpdateProject(SY_AUTHTOKEN, ts.URL, PROJECT3_SAVED_ID, project.Name, project.Description, project.Status, project.Images, nil, true)
+		imageIdsList := project.ImageIds
+		imagesFromServer := []*model.Image{}
+
+		Convey("When we make a request to add another image to the project", func() {
+			id, err := apiClient.CreateImage(SY_AUTHTOKEN, ts.URL, PROJECT3_SAVED_ID, "alpine", "id1", "latest", []string{}, "description", "public registry", "public registry", true)
+			Convey("Then we get back a successful response", func() {
+				So(err, ShouldBeNil)
+				So(id, ShouldNotBeEmpty)
+				imageIdsList = append(imageIdsList, id)
+			})
+		})
+
+		Convey("When we request an update of the project", func() {
+			code, err := apiClient.UpdateProject(SY_AUTHTOKEN, ts.URL, PROJECT3_SAVED_ID, project.Name, project.Description, project.Status, nil, project.Images, nil, nil, true)
 			Convey("Then we should get a successful response", func() {
 				So(err, ShouldBeNil)
 				So(code, ShouldEqual, http.StatusNoContent)
@@ -502,133 +532,44 @@ func TestAddProjectImageViaUpdate(t *testing.T) {
 					So(err, ShouldBeNil)
 					So(project, ShouldNotBeNil)
 					So(code, ShouldEqual, http.StatusOK)
-					So(len(project.Images), ShouldEqual, 2)
-					imageNames := []string{}
-					for _, image := range project.Images {
-						imageNames = append(imageNames, image.Name)
-					}
-					So(IMAGE1_NAME, ShouldBeIn, imageNames)
-					So(IMAGE2_NAME, ShouldBeIn, imageNames)
-					Convey("Then if we remove an image and request an update the images collection should decrease by one", func() {
-						imagesToKeep := []*model.Image{}
-
-						for _, image := range project.Images {
-							if image.Name == IMAGE1_NAME {
-								imagesToKeep = append(imagesToKeep, image)
-								break
-							}
-						}
-						code, err := apiClient.UpdateProject(SY_AUTHTOKEN, ts.URL, PROJECT3_SAVED_ID, project.Name, project.Description, project.Status, imagesToKeep, nil, true)
-						So(err, ShouldBeNil)
-						So(code, ShouldEqual, http.StatusNoContent)
-						project, code, err := apiClient.GetProject(SY_AUTHTOKEN, ts.URL, PROJECT3_SAVED_ID)
-						So(err, ShouldBeNil)
-						So(project, ShouldNotBeNil)
-						So(code, ShouldEqual, http.StatusOK)
-						So(len(project.Images), ShouldEqual, 1)
-					})
+					So(imageIdsList, ShouldResemble, project.ImageIds)
+					So(len(project.ImageIds), ShouldEqual, 2)
 				})
 			})
 		})
-	})
-}
 
-func TestManagingProjectImagesNesting(t *testing.T) {
-	savedProjectId := ""
-	// TODO: refactor all of these hard-coded values to contants
-	busybox := model.NewImage(
-		"busybox",
-		"23asdfsadf",
-		"latest",
-		[]string{"ilmTag1", "ilmTag2"},
-		"my busybox",
-		"myRegistryId424324243",
-		"artifactory registry",
-		true,
-		"blank",
-	)
-	alpine := model.NewImage(
-		"alpine",
-		"2asdfasf23423c",
-		"latest",
-		[]string{"ilmTag3", "ilmTag4"},
-		"my alpine",
-		"",
-		"DockerHub",
-		true,
-		"blank",
-	)
-
-	imageList := []*model.Image{}
-	imageList = append(imageList, busybox)
-	imageList = append(imageList, alpine)
-	imagesFromServer := []*model.Image{}
-
-	Convey("Given that we do not have any projects or images", t, func() {
-		cleanup()
-		Convey("When we create a new project with two images in it", func() {
-			projectId, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, "Project with cool images", "self-explanatory", "new", imageList, nil, true)
-			So(projectId, ShouldNotBeBlank)
-			So(code, ShouldEqual, http.StatusCreated)
-			So(err, ShouldBeNil)
-			savedProjectId = projectId
-			Convey("Then we should be able to retrieve the project with the list of images embedded", func() {
-				coolProject, code, err := apiClient.GetProject(SY_AUTHTOKEN, ts.URL, projectId)
-
-				So(coolProject, ShouldNotBeNil)
+		Convey("Given that we have added two images to the previously created project", func() {
+			So(PROJECT3_SAVED_ID, ShouldNotBeBlank)
+			Convey("When we request the same images using a nested projects route", func() {
+				images, code, err := apiClient.GetProjectImages(SY_AUTHTOKEN, ts.URL, PROJECT3_SAVED_ID)
 				So(code, ShouldEqual, http.StatusOK)
 				So(err, ShouldBeNil)
-
-				So(len(coolProject.Images), ShouldEqual, 2)
-
-				Convey("And the images should have ids and other attributes with the correct values", func() {
+				Convey("Then we should get the same images as before", func() {
 					names := []string{}
-
-					for _, image := range coolProject.Images {
+					So(len(images), ShouldEqual, 2)
+					for _, image := range images {
 						names = append(names, image.Name)
 						So(image.ID, ShouldNotBeBlank)
+						imagesFromServer = append(imagesFromServer, image)
 					}
 
-					So(busybox.Name, ShouldBeIn, names)
-					So(alpine.Name, ShouldBeIn, names)
-
-				})
-			})
-		})
-	})
-
-	Convey("Given that we have added two images to the previously created project", t, func() {
-		So(savedProjectId, ShouldNotBeBlank)
-		Convey("When we request the same images using a nested projects route", func() {
-			images, code, err := apiClient.GetProjectImages(SY_AUTHTOKEN, ts.URL, savedProjectId)
-			So(code, ShouldEqual, http.StatusOK)
-			So(err, ShouldBeNil)
-			Convey("Then we should get the same images as before", func() {
-				names := []string{}
-				So(len(images), ShouldEqual, 2)
-				for _, image := range images {
-					names = append(names, image.Name)
-					So(image.ID, ShouldNotBeBlank)
-					// Save for following test flow
-					imagesFromServer = append(imagesFromServer, image)
-				}
-
-				So(busybox.Name, ShouldBeIn, names)
-				So(alpine.Name, ShouldBeIn, names)
-				Convey("And we should be able to retrieve those images individually through the nested route.", func() {
-					for _, currentImage := range imagesFromServer {
-						image, code, err := apiClient.GetProjectImage(SY_AUTHTOKEN, ts.URL, savedProjectId, currentImage.ID)
-						So(image, ShouldNotBeNil)
-						So(code, ShouldEqual, http.StatusOK)
-						So(err, ShouldBeNil)
-						So(image.ID, ShouldEqual, currentImage.ID)
-					}
-					Convey("And we should be able to remove those images by id using the nested route", func() {
+					So("busybox", ShouldBeIn, names)
+					So("alpine", ShouldBeIn, names)
+					Convey("And we should be able to retrieve those images individually through the nested route.", func() {
 						for _, currentImage := range imagesFromServer {
-							code, err := apiClient.DeleteProjectImage(SY_AUTHTOKEN, ts.URL, savedProjectId, currentImage.ID)
-							So(code, ShouldEqual, http.StatusNoContent)
+							image, code, err := apiClient.GetProjectImage(SY_AUTHTOKEN, ts.URL, PROJECT3_SAVED_ID, currentImage.ID)
+							So(image, ShouldNotBeNil)
+							So(code, ShouldEqual, http.StatusOK)
 							So(err, ShouldBeNil)
+							So(image.ID, ShouldEqual, currentImage.ID)
 						}
+						Convey("And we should be able to remove those images by id using the nested route", func() {
+							for _, currentImage := range imagesFromServer {
+								code, err := apiClient.DeleteProjectImage(SY_AUTHTOKEN, ts.URL, PROJECT3_SAVED_ID, currentImage.ID)
+								So(code, ShouldEqual, http.StatusNoContent)
+								So(err, ShouldBeNil)
+							}
+						})
 					})
 				})
 

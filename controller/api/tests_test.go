@@ -127,7 +127,7 @@ func TestCreateNewTest(t *testing.T) {
 	Convey("Given that we have a valid token and we have a valid project created", t, func() {
 		So(SY_AUTHTOKEN, ShouldNotBeNil)
 		So(SY_AUTHTOKEN, ShouldNotBeEmpty)
-		projectId, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, PROJECT1_NAME, PROJECT1_DESC, PROJECT1_STATUS, nil, nil, false)
+		projectId, code, err := apiClient.CreateProject(SY_AUTHTOKEN, ts.URL, PROJECT1_NAME, PROJECT1_DESC, PROJECT1_STATUS, nil, nil, nil, nil, false)
 		So(err, ShouldBeNil)
 		So(code, ShouldEqual, http.StatusCreated)
 		//So(projectId, ShouldNotBeEmpty)

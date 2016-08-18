@@ -112,10 +112,9 @@ func (a *Api) getTest(w http.ResponseWriter, r *http.Request) {
 	                - content: |
 	                    Test with id c38129ed-9ec4-40be-9682-b48a1834b2c2 not found.*/
 	vars := mux.Vars(r)
-	projId := vars["projectId"]
 	testId := vars["testId"]
 
-	test, err := a.manager.GetTest(projId, testId)
+	test, err := a.manager.GetTest(testId)
 	if err != nil {
 		log.Errorf("error retrieving result: %s", err)
 		http.Error(w, err.Error(), http.StatusNotFound)
@@ -157,10 +156,9 @@ func (a *Api) updateTest(w http.ResponseWriter, r *http.Request) {
 	            type: Error
 	*/
 	vars := mux.Vars(r)
-	projId := vars["projectId"]
 	testId := vars["testId"]
 
-	test, err := a.manager.GetTest(projId, testId)
+	test, err := a.manager.GetTest(testId)
 	if err != nil {
 		log.Errorf("error updating test: %s", err)
 		http.Error(w, err.Error(), http.StatusNotFound)
@@ -171,7 +169,7 @@ func (a *Api) updateTest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := a.manager.UpdateTest(projId, test); err != nil {
+	if err := a.manager.UpdateTest(test); err != nil {
 		log.Errorf("error updating result: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -210,7 +208,7 @@ func (a *Api) deleteTest(w http.ResponseWriter, r *http.Request) {
 	projId := vars["projectId"]
 	testId := vars["testId"]
 
-	test, err := a.manager.GetTest(projId, testId)
+	test, err := a.manager.GetTest(testId)
 	if err != nil {
 		log.Errorf("error deleting test: %s", err)
 		http.Error(w, err.Error(), http.StatusNotFound)

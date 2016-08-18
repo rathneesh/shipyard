@@ -94,7 +94,6 @@ type Test struct {
 	Tagging          Tagging           `json:"tagging" gorethink:"tagging"`
 	FromTag          string            `json:"fromTag" gorethink:"fromTag"`
 	Parameters       []*Parameter      `json:"parameters" gorethink:"parameters"`
-	ProjectId        string            `json:"projectId" gorethink:"projectId"`
 }
 type TestProvider struct {
 	ProviderType string `json:"providerType" gorethink:"providerType"`
@@ -111,7 +110,6 @@ func (t *Test) NewTest(
 	description string,
 	targets []*TargetArtifact,
 	selectedTestType string,
-	projectId string,
 	providerType string,
 	providerName string,
 	providerTest string,
@@ -133,7 +131,6 @@ func (t *Test) NewTest(
 	test.Tagging.OnFailure = failTag
 	test.FromTag = fromTag
 	test.Parameters = parameters
-	test.ProjectId = projectId
 
 	return test
 }

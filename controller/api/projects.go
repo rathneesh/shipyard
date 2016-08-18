@@ -6,8 +6,8 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
-	"github.com/shipyard/shipyard/model"
 	"github.com/gorilla/websocket"
+	"github.com/shipyard/shipyard/model"
 )
 
 func (a *Api) projects(w http.ResponseWriter, r *http.Request) {
@@ -131,7 +131,7 @@ func (a *Api) projectUpdates(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	defer func(){
+	defer func() {
 		conn.Close()
 		log.Printf("Closing websocket connection")
 	}()
