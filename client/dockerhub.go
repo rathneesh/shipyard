@@ -3,10 +3,10 @@ package ilm_client
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"github.com/shipyard/shipyard/model"
 	"github.com/shipyard/shipyard/model/dockerhub"
+	"io/ioutil"
+	"net/http"
 	"strings"
 )
 
@@ -31,7 +31,7 @@ func DockerHubSearchImage(authHeader, url string, imageName string) ([]dockerhub
 		}
 	}
 }
-func getDockerHubToken(imageName string ) string {
+func getDockerHubToken(imageName string) string {
 	jsonToken := model.DockerHubV2Token{}
 	response, err := http.Get("https://auth.docker.io/token?service=registry.docker.io&scope=repository:" + imageName + ":pull")
 	if err != nil {
@@ -51,13 +51,13 @@ func getDockerHubToken(imageName string ) string {
 	return jsonToken.Token
 }
 func DockerHubSearchImageTags(authHeader, url string, imageName string) ([]string, int, error) {
-	 if !strings.Contains(imageName,"/"){
-		 imageName = "library/" + imageName
+	if !strings.Contains(imageName, "/") {
+		imageName = "library/" + imageName
 	}
 	token := getDockerHubToken(imageName)
-	header := "Bearer "+ token
+	header := "Bearer " + token
 	client := &http.Client{}
-	req, _ := http.NewRequest("GET", "https://registry-1.docker.io/v2/" + imageName + "/tags/list", nil)
+	req, _ := http.NewRequest("GET", "https://registry-1.docker.io/v2/"+imageName+"/tags/list", nil)
 	req.Header.Set("Authorization", header)
 	resp, err := client.Do(req)
 	if err != nil {

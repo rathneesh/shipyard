@@ -8,15 +8,15 @@ import (
 	c "github.com/shipyard/shipyard/checker"
 	apiClient "github.com/shipyard/shipyard/client"
 	"github.com/shipyard/shipyard/model"
-	"time"
 	"github.com/shipyard/shipyard/utils/emitter"
+	"time"
 )
 
 type executeBuildTasksResults struct {
 	projectResult *model.Result
-	appliedTag string
-	buildStatus string
-	buildResult *model.BuildResult
+	appliedTag    string
+	buildStatus   string
+	buildResult   *model.BuildResult
 }
 
 //methods related to the Build structure
@@ -107,7 +107,7 @@ func (m DefaultManager) CreateAllBuilds(projectId string, WsEmmitter *emitter.Em
 		}
 
 		project.ActionStatus = model.ProjectFinishedActionLabel
-		project.Status       = projectStatus
+		project.Status = projectStatus
 
 		m.UpdateProject(project)
 
@@ -154,7 +154,7 @@ func (m DefaultManager) CreateBuild(
 	}
 
 	// Get the Test and its TargetArtifacts
-	test, err := m.GetTest(projectId, testId)
+	test, err := m.GetTest(testId)
 	if err != nil && err != ErrTestDoesNotExist {
 		return "", err
 	}
@@ -339,15 +339,15 @@ func (m DefaultManager) executeBuildTask(
 
 		// Instantiate `testResult` with the information we have
 		testResult := &model.TestResult{
-			TestId: test.ID,
-			ImageId: image.ID,
+			TestId:        test.ID,
+			ImageId:       image.ID,
 			DockerImageId: dockerImageId,
-			BuildId: build.ID,
-			TestName: test.Name,
-			ImageName: image.PullableName(),
+			BuildId:       build.ID,
+			TestName:      test.Name,
+			ImageName:     image.PullableName(),
 			SimpleResult: model.SimpleResult{
-				Date: time.Now(),
-				Status: finishLabel,
+				Date:    time.Now(),
+				Status:  finishLabel,
 				EndDate: time.Now(),
 				AppliedTag: []string{
 					appliedTag,
@@ -370,7 +370,7 @@ func (m DefaultManager) executeBuildTask(
 			TestResults: []*model.TestResult{
 				testResult,
 			},
-			LastUpdate: time.Now(),
+			LastUpdate:     time.Now(),
 			LastTagApplied: appliedTag,
 		}
 
@@ -378,9 +378,9 @@ func (m DefaultManager) executeBuildTask(
 
 		channel <- executeBuildTasksResults{
 			projectResult: projectResult,
-			appliedTag: appliedTag,
-			buildStatus: finishLabel,
-			buildResult: buildResult,
+			appliedTag:    appliedTag,
+			buildStatus:   finishLabel,
+			buildResult:   buildResult,
 		}
 	}()
 
@@ -523,5 +523,3 @@ func (m DefaultManager) CreateOrUpdateResults(id string, result *model.Result) e
 
 	return err
 }
-
-

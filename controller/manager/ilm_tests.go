@@ -10,19 +10,22 @@ import (
 
 func (m DefaultManager) GetTests(projectId string) ([]*model.Test, error) {
 
-	res, err := r.Table(tblNameTests).Filter(map[string]string{"projectId": projectId}).Run(m.session)
-	defer res.Close()
-	if err != nil {
-		return nil, err
-	}
 	tests := []*model.Test{}
-	if err := res.All(&tests); err != nil {
-		return nil, err
+	proj, _ := m.Project(projectId)
+	if proj.TestIds != nil {
+		for _, testid := range proj.TestIds {
+
+			var currTest *model.Test
+
+			currTest, _ = m.GetTest(testid)
+			tests = append(tests, currTest)
+		}
+
 	}
 	return tests, nil
 }
 
-func (m DefaultManager) GetTest(projectId, testId string) (*model.Test, error) {
+func (m DefaultManager) GetTest(testId string) (*model.Test, error) {
 	var test *model.Test
 	res, err := r.Table(tblNameTests).Filter(map[string]string{"id": testId}).Run(m.session)
 	defer res.Close()
@@ -41,7 +44,6 @@ func (m DefaultManager) GetTest(projectId, testId string) (*model.Test, error) {
 
 func (m DefaultManager) CreateTest(projectId string, test *model.Test) error {
 	var eventType string
-	test.ProjectId = projectId
 	response, err := r.Table(tblNameTests).Insert(test).RunWrite(m.session)
 	if err != nil {
 
@@ -53,23 +55,25 @@ func (m DefaultManager) CreateTest(projectId string, test *model.Test) error {
 		}
 		return ""
 	}()
+	proj, _ := m.Project(projectId)
+	proj.TestIds = append(proj.TestIds, test.ID)
+	m.UpdateTestIds(proj)
 	eventType = "add-test"
 
 	m.logEvent(eventType, fmt.Sprintf("id=%s", test.ID), []string{"security"})
 	return nil
 }
 
-func (m DefaultManager) UpdateTest(projectId string, test *model.Test) error {
+func (m DefaultManager) UpdateTest(test *model.Test) error {
 	var eventType string
 	// check if exists; if so, update
-	rez, err := m.GetTest(projectId, test.ID)
+	rez, err := m.GetTest(test.ID)
 	if err != nil && err != ErrTestDoesNotExist {
 		return err
 	}
 	// update
 	if rez != nil {
 		updates := map[string]interface{}{
-			"projectId":        test.ProjectId,
 			"description":      test.Description,
 			"name":             test.Name,
 			"targets":          test.Targets,
@@ -104,6 +108,15 @@ func (m DefaultManager) DeleteTest(projectId string, testId string) error {
 		return ErrTestDoesNotExist
 	}
 
+	proj, _ := m.Project(projectId)
+	newTestIdList := []string{}
+	for _, id := range proj.TestIds {
+		if id != testId {
+			newTestIdList = append(newTestIdList, id)
+		}
+	}
+	proj.TestIds = newTestIdList
+	m.UpdateTestIds(proj)
 	m.logEvent("delete-test", fmt.Sprintf("id=%s", testId), []string{"security"})
 	return nil
 }

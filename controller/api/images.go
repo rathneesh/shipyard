@@ -63,17 +63,16 @@ func (a *Api) getImages(w http.ResponseWriter, r *http.Request) {
 func (a *Api) getImage(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
-	projId := vars["projectId"]
 	imageId := vars["imageId"]
 
-	test, err := a.manager.GetImage(projId, imageId)
+	image, err := a.manager.GetImage(imageId)
 	if err != nil {
 		log.Errorf("error retrieving image: %s", err)
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(test); err != nil {
+	if err := json.NewEncoder(w).Encode(image); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -82,10 +81,9 @@ func (a *Api) getImage(w http.ResponseWriter, r *http.Request) {
 func (a *Api) updateImage(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
-	projId := vars["projectId"]
 	imageId := vars["imageId"]
 
-	image, err := a.manager.GetImage(projId, imageId)
+	image, err := a.manager.GetImage(imageId)
 	if err != nil {
 		log.Errorf("error updating image: %s", err)
 		http.Error(w, err.Error(), http.StatusNotFound)
@@ -96,7 +94,7 @@ func (a *Api) updateImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := a.manager.UpdateImage(projId, image); err != nil {
+	if err := a.manager.UpdateImage(image); err != nil {
 		log.Errorf("error updating image: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -112,7 +110,7 @@ func (a *Api) deleteImage(w http.ResponseWriter, r *http.Request) {
 	projId := vars["projectId"]
 	imageId := vars["imageId"]
 
-	image, err := a.manager.GetImage(projId, imageId)
+	image, err := a.manager.GetImage(imageId)
 	if err != nil {
 		log.Errorf("error deleting image: %s", err)
 		http.Error(w, err.Error(), http.StatusNotFound)

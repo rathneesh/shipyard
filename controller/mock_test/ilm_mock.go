@@ -38,7 +38,7 @@ func (m MockManager) Image(name string) (*model.Image, error) {
 	return nil, nil
 }
 
-func (m MockManager) UpdateImage(projectId string, image *model.Image) error {
+func (m MockManager) UpdateImage(image *model.Image) error {
 	return nil
 }
 
@@ -54,12 +54,12 @@ func (m MockManager) DeleteAllImages() error {
 	return nil
 }
 
-func (m MockManager) GetTest(projectId, testId string) (*model.Test, error) { return nil, nil }
-func (m MockManager) GetTests(projectId string) ([]*model.Test, error)      { return nil, nil }
-func (m MockManager) CreateTest(projectId string, test *model.Test) error   { return nil }
-func (m MockManager) UpdateTest(projectId string, test *model.Test) error   { return nil }
-func (m MockManager) DeleteTest(projectId string, testId string) error      { return nil }
-func (m MockManager) DeleteAllTests() error                                 { return nil }
+func (m MockManager) GetTest(testId string) (*model.Test, error)          { return nil, nil }
+func (m MockManager) GetTests(projectId string) ([]*model.Test, error)    { return nil, nil }
+func (m MockManager) CreateTest(projectId string, test *model.Test) error { return nil }
+func (m MockManager) UpdateTest(test *model.Test) error                   { return nil }
+func (m MockManager) DeleteTest(projectId string, testId string) error    { return nil }
+func (m MockManager) DeleteAllTests() error                               { return nil }
 
 func (m MockManager) GetResults(projectId string) (*model.Result, error)          { return nil, nil }
 func (m MockManager) GetResult(projectId, resultId string) (*model.Result, error) { return nil, nil }
@@ -128,7 +128,7 @@ func (m MockManager) GetBuildResults(projectId string, testId string, buildId st
 	return nil, nil
 }
 
-func (m MockManager) GetImage(projectId string, imageId string) (*model.Image, error) {
+func (m MockManager) GetImage(imageId string) (*model.Image, error) {
 	return nil, nil
 }
 
