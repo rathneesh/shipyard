@@ -67,3 +67,60 @@ services:
     depends_on:
       - postgres
       - controller
+
+  server:
+    volumes:
+      - /home/andreea/server-configdir:/etc/docker/notary-server/
+    environment:
+      - NOTARY_SERVER_TRUST_SERVICE_TYPE=local
+      - NOTARY_SERVER_STORAGE_BACKEND=memory
+      - NOTARY_SERVER_LOGGING_LEVEL=debug
+    image: notary:server-0.3.0
+    networks:
+      - mdb
+      - sig
+    ports:
+      - "8080"
+      - "4443:4443"
+    entrypoint: /usr/bin/env sh
+    command: -c "notary-server -config=/etc/docker/notary-server/config.json"
+    depends_on:
+      - mysql
+      - signer
+      - controller
+
+  signer:
+    volumes:
+      - /home/andreea/server-configdir:/etc/docker/notary-server/
+    image: notary:signer-0.3.0
+    networks:
+      mdb:
+      sig:
+        aliases:
+          - notarysigner
+    entrypoint: /usr/bin/env sh
+    command: -c "notary-signer -config=/etc/docker/notary-server/signer-config.json"
+    depends_on:
+      - mysql
+      - controller
+
+  mysql:
+    networks:
+      - mdb
+    volumes:
+      - ./notarymysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - notary_data:/var/lib/mysql
+    image: mariadb:10.1.10
+    environment:
+      - TERM=dumb
+      - MYSQL_ALLOW_EMPTY_PASSWORD="true"
+    command: mysqld --innodb_file_per_table
+
+volumes:
+  notary_data:
+    external: false
+networks:
+  mdb:
+    external: false
+  sig:
+    external: false
