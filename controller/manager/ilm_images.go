@@ -8,8 +8,8 @@ import (
 	"github.com/samalba/dockerclient"
 	apiClient "github.com/shipyard/shipyard/client"
 	"github.com/shipyard/shipyard/model"
-	"time"
 	"strings"
+	"time"
 )
 
 var (
@@ -87,24 +87,22 @@ func (m DefaultManager) PullImage(image model.Image) error {
 
 //methods related to the Image structure
 func (m DefaultManager) GetImages(projectId string) ([]*model.Image, error) {
-
-	res, err := r.Table(tblNameImages).Filter(map[string]string{"projectId": projectId}).Run(m.session)
-	defer res.Close()
-	if err != nil {
-		return nil, err
-	}
 	images := []*model.Image{}
-	if err := res.All(&images); err != nil {
-		return nil, err
-	}
+	proj, _ := m.Project(projectId)
+	if proj.ImageIds != nil {
+		for _, imgId := range proj.ImageIds {
 
-	for _, image := range images {
-		m.injectRegistryInfo(image)
+			var currImg *model.Image
+
+			currImg, _ = m.GetImage(imgId)
+			images = append(images, currImg)
+		}
+
 	}
 	return images, nil
 }
 
-func (m DefaultManager) GetImage(projectId string, imageId string) (*model.Image, error) {
+func (m DefaultManager) GetImage(imageId string) (*model.Image, error) {
 	var image *model.Image
 	res, err := r.Table(tblNameImages).Filter(map[string]string{"id": imageId}).Run(m.session)
 	defer res.Close()
@@ -135,7 +133,6 @@ func (m DefaultManager) injectRegistryInfo(image *model.Image) {
 
 func (m DefaultManager) CreateImage(projectId string, image *model.Image) error {
 	var eventType string
-	image.ProjectId = projectId
 
 	m.injectRegistryInfo(image)
 	response, err := r.Table(tblNameImages).Insert(image).RunWrite(m.session)
@@ -149,16 +146,20 @@ func (m DefaultManager) CreateImage(projectId string, image *model.Image) error 
 		}
 		return ""
 	}()
+	// we get the project and update its imageids list with the recently added image
+	proj, _ := m.Project(projectId)
+	proj.ImageIds = append(proj.ImageIds, image.ID)
+	m.UpdateImageIds(proj)
 	eventType = "add-image"
 
 	m.logEvent(eventType, fmt.Sprintf("id=%s", image.ID), []string{"security"})
 	return nil
 }
 
-func (m DefaultManager) UpdateImage(projectId string, image *model.Image) error {
+func (m DefaultManager) UpdateImage(image *model.Image) error {
 	var eventType string
 	// check if exists; if so, update
-	rez, err := m.GetImage(projectId, image.ID)
+	rez, err := m.GetImage(image.ID)
 	if err != nil && err != ErrImageDoesNotExist {
 		return err
 	}
@@ -179,7 +180,6 @@ func (m DefaultManager) UpdateImage(projectId string, image *model.Image) error 
 		"registryId":     image.RegistryId,
 		"location":       image.Location,
 		"skipImageBuild": image.SkipImageBuild,
-		"projectId":      image.ProjectId,
 		"registryDomain": image.RegistryDomain,
 	}
 	if _, err := r.Table(tblNameImages).Filter(map[string]string{"id": image.ID}).Update(updates).RunWrite(m.session); err != nil {
@@ -196,7 +196,7 @@ func (m DefaultManager) UpdateImage(projectId string, image *model.Image) error 
 // performs a `docker tag` to reflect the changes
 func (m DefaultManager) UpdateImageIlmTags(projectId string, imageId string, ilmTag string) error {
 	// check if exists; if so, update
-	image, err := m.GetImage(projectId, imageId)
+	image, err := m.GetImage(imageId)
 	if err != nil && err != ErrImageDoesNotExist {
 		return err
 	}
@@ -245,7 +245,15 @@ func (m DefaultManager) DeleteImage(projectId string, imageId string) error {
 	if res.IsNil() {
 		return ErrImageDoesNotExist
 	}
-
+	proj, _ := m.Project(projectId)
+	newImageIdList := []string{}
+	for _, id := range proj.ImageIds {
+		if id != imageId {
+			newImageIdList = append(newImageIdList, id)
+		}
+	}
+	proj.ImageIds = newImageIdList
+	m.UpdateImageIds(proj)
 	m.logEvent("delete-image", fmt.Sprintf("id=%s", imageId), []string{"security"})
 
 	return nil

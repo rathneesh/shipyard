@@ -3,12 +3,10 @@ package model
 import "time"
 
 const (
-	ProjectNewActionLabel = "new"
+	ProjectNewActionLabel        = "new"
 	ProjectInProgressActionLabel = "in_progress"
-	ProjectStoppedActionLabel = "stopped"
-	ProjectFinishedActionLabel = "finished"
-
-
+	ProjectStoppedActionLabel    = "stopped"
+	ProjectFinishedActionLabel   = "finished"
 )
 
 // Please note that Images is not stored in the database as a nested collection (i.e. gorethink:"-")
@@ -19,8 +17,10 @@ type Project struct {
 	Description  string    `json:"description" gorethink:"description"`
 	Status       string    `json:"status" gorethink:"status"`
 	ActionStatus string    `json:"actionStatus" gorethink:"actionStatus"`
+	ImageIds     []string  `json:"imageids" gorethink:"imageids"`
 	Images       []*Image  `json:"images,omitempty" gorethink:"-"`
 	Tests        []*Test   `json:"tests,omitempty" gorethink:"-"`
+	TestIds      []string  `json:"testids" gorethink:"testids"`
 	NeedsBuild   bool      `json:"needsBuild" gorethink:"needsBuild"`
 	CreationTime time.Time `json:"creationTime" gorethink:"creationTime"`
 	UpdateTime   time.Time `json:"updateTime" gorethink:"updateTime"`
@@ -29,14 +29,16 @@ type Project struct {
 	UpdatedBy    string    `json:"updatedBy" gorethink:"updatedBy"`
 }
 
-func (p *Project) NewProject(name string, description string, status string, images []*Image, tests []*Test, needsBuild bool, creationTime time.Time, updateTime time.Time, lastRunTime time.Time, author string, updatedBy string) *Project {
+func (p *Project) NewProject(name string, description string, status string, imageIds []string, images []*Image, tests []*Test, testIds []string, needsBuild bool, creationTime time.Time, updateTime time.Time, lastRunTime time.Time, author string, updatedBy string) *Project {
 
 	return &Project{
 		Name:         name,
 		Description:  description,
 		Status:       status,
+		ImageIds:     imageIds,
 		Images:       images,
 		Tests:        tests,
+		TestIds:      testIds,
 		NeedsBuild:   needsBuild,
 		CreationTime: creationTime,
 		UpdateTime:   updateTime,

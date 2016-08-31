@@ -42,15 +42,15 @@ func GetImages(authHeader, url string) ([]model.Image, error) {
 	return images, nil
 }
 
-func CreateImage(authHeader string, url string, name string, imageId string, tag string, ilmtags []string, description string, registryId string, location string, skipImageBuild bool, projectId string) (string, error) {
+func CreateImage(authHeader string, url string, projectId string, name string, imageId string, tag string, ilmtags []string, description string, registryId string, location string, skipImageBuild bool) (string, error) {
 
-	image := model.NewImage(name, imageId, tag, ilmtags, description, registryId, location, skipImageBuild, projectId)
+	image := model.NewImage(name, imageId, tag, ilmtags, description, registryId, location, skipImageBuild)
 	//make a request to create it
 	data, err := json.Marshal(image)
 	if err != nil {
 		return "", err
 	}
-	resp, err := sendRequest(authHeader, "POST", fmt.Sprintf("%s/api/ilm_images", url), string(data))
+	resp, err := sendRequest(authHeader, "POST", fmt.Sprintf("%s/api/projects/%s/images", url, projectId), string(data))
 	if err != nil {
 		return "", err
 	} else {
@@ -67,9 +67,9 @@ func CreateImage(authHeader string, url string, name string, imageId string, tag
 	}
 }
 
-func UpdateImage(authHeader string, url string, id string, name string, imageId string, tag string, ilmtags []string, description string, registryId string, location string, skipImageBuild bool, projectId string) error {
+func UpdateImage(authHeader string, url string, id string, name string, imageId string, tag string, ilmtags []string, description string, registryId string, location string, skipImageBuild bool) error {
 
-	image := model.NewImage(name, imageId, tag, ilmtags, description, registryId, location, skipImageBuild, projectId)
+	image := model.NewImage(name, imageId, tag, ilmtags, description, registryId, location, skipImageBuild)
 	image.ID = id
 	data, err := json.Marshal(image)
 	if err != nil {

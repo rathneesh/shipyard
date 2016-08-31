@@ -13,12 +13,12 @@ import (
 	"github.com/shipyard/shipyard/model"
 	"github.com/shipyard/shipyard/model/dockerhub"
 	"github.com/shipyard/shipyard/utils/auth"
+	"github.com/shipyard/shipyard/utils/emitter"
 	"github.com/shipyard/shipyard/version"
 	"net"
 	"net/http"
 	"strings"
 	"time"
-	"github.com/shipyard/shipyard/utils/emitter"
 )
 
 const (
@@ -118,17 +118,17 @@ type (
 		PullImage(image model.Image) error
 
 		GetImages(projectId string) ([]*model.Image, error)
-		GetImage(projectId, imageId string) (*model.Image, error)
+		GetImage(imageId string) (*model.Image, error)
 		CreateImage(projectId string, image *model.Image) error
-		UpdateImage(projectId string, image *model.Image) error
+		UpdateImage(image *model.Image) error
 		UpdateImageIlmTags(projectId string, imageId string, ilmTag string) error
 		DeleteImage(projectId string, imageId string) error
 		DeleteAllImages() error
 
 		GetTests(projectId string) ([]*model.Test, error)
-		GetTest(projectId, testId string) (*model.Test, error)
+		GetTest(testId string) (*model.Test, error)
 		CreateTest(projectId string, test *model.Test) error
-		UpdateTest(projectId string, test *model.Test) error
+		UpdateTest(test *model.Test) error
 		DeleteTest(projectId string, testId string) error
 		DeleteAllTests() error
 
