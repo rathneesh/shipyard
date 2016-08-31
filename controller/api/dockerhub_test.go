@@ -86,7 +86,7 @@ func TestDockerhubGetAuthToken(t *testing.T) {
 	})
 }
 
-func TestDockerhubSearchImages(t *testing.T) {
+/*func TestDockerhubSearchImages(t *testing.T) {
 	Convey("Given that we have a valid token", t, func() {
 		So(SY_AUTHTOKEN, ShouldNotBeNil)
 		So(SY_AUTHTOKEN, ShouldNotBeEmpty)
@@ -103,7 +103,7 @@ func TestDockerhubSearchImages(t *testing.T) {
 
 		})
 	})
-}
+}*/
 
 func TestDockerhubSearchImageTags(t *testing.T) {
 	Convey("Given that we have a valid token", t, func() {
