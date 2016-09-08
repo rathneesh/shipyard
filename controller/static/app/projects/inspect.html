@@ -1,15 +1,18 @@
-<div id="inspect-project-history-{{vm.results.projectId}}" class="ui blue vertical demo sidebar menu">
+<div id="inspect-project-history-{{vm.results.projectId}}" class="ui blue vertical demo sidebar menu"
+     xmlns:limitTo="http://www.w3.org/1999/xhtml" xmlns:limitTo="http://www.w3.org/1999/xhtml"
+     xmlns:limitTo="http://www.w3.org/1999/xhtml" xmlns:limitTo="http://www.w3.org/1999/xhtml"
+     xmlns:limitTo="http://www.w3.org/1999/xhtml" xmlns:limitTo="http://www.w3.org/1999/xhtml">
     <a class="item" style="background-color: #006E93">
         <h4 class="ui header" style="color: white"><i class="clock icon"></i>Project History For:</h4>
         <h4 class="ui header" style="color: white">
             <i class="circle icon" ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'grey' : 'red'"></i>
-            {{vm.results.projectId}}
+            {{vm.proj.$$state.value.name}}
         </h4>
     </a>
     <div class="item">
         <div class="column" style="overflow-y:scroll; height: 550px">
-        <div class="active item">
-            <i class="circle icon" ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'grey' : 'red'"></i>{{vm.results.buildId}}
+        <div class="active item" ng-repeat="test in vm.results.testResults" jquery>
+            <i class="circle icon" ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'grey' : 'red'"></i>{{test.buildId}}
         </div>
         </div>
     </div>
@@ -31,6 +34,9 @@
                         <div class="column">
                             <div id="history-project-inspect-view" ng-click="vm.showProjectHistory()" class="ui small blue labeled icon button">
                                 <i class="clock icon"></i> Project History
+
+                                    <tr ng-repeat="test in vm.results.testResults" jquery>
+
                             </div>
                             <span ng-show="!vm.refresh" style="float: right">
                                 <a id="auto-refresh-enabled" ng-click="vm.startRefresh(vm.results.projectId)" style="color: #006D95; cursor: pointer; font-weight: bold">Auto Refresh <i class="refresh icon"></i></a>
@@ -64,9 +70,6 @@
                                         </div>
                                     </div>
                                     <div class="six fields">
-                                        <div class="field">
-                                            <label>Build ID: <span style="font-weight: normal">{{vm.results.buildId || '...'}}</span></label>
-                                        </div>
                                         <div class="field">
                                             <label>Run Date: <span style="font-weight: normal">{{vm.results.runDate || '...'}}</span></label>
                                         </div>

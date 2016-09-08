@@ -176,6 +176,14 @@
                     });
                 return promise;
             },
+            getProjectByID: function(projectId) {
+                var promise = $http
+                    .get('/api/projects/' + projectId)
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
         ///api/projects/:id/tests/:testId/builds
             //BuildAction action: enum: ["start", "restart", "stop"]
             executeBuild: function(projectId, testId, buildAction) {

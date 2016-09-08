@@ -33,6 +33,8 @@
         vm.cancelRefresh = cancelRefresh;
 
         vm.results = resolvedResults;
+        vm.proj = ProjectService.getProjectByID(vm.results.projectId);
+
         angular.forEach(vm.results.testResults, function (result, key) {
             testResults(vm.results.projectId,result.testId,result.buildId).then(function (response) {
                 vm.results[key].istestResult = response;
