@@ -1,4 +1,4 @@
-(function(){
+(function () {
     'use strict';
 
     angular
@@ -31,8 +31,11 @@
         vm.testResults = testResults;
         vm.startRefresh = startRefresh;
         vm.cancelRefresh = cancelRefresh;
-
+        vm.listImages = listImages;
+        vm.showTestResults = showTestResults;
         vm.results = resolvedResults;
+
+        listImages($stateParams.id);
         vm.proj = ProjectService.getProjectByID(vm.results.projectId);
 
         angular.forEach(vm.results.testResults, function (result, key) {
@@ -53,6 +56,15 @@
                     return true;
                 }, function(data) {
                     return false;
+                });
+        }
+
+        function listImages(projectId) {
+            return ProjectService.getImages(projectId)
+                .then(function (data) {
+                    vm.images = data;
+                }, function (data) {
+                    vm.error = data;
                 });
         }
 
@@ -80,6 +92,18 @@
                 $interval.cancel(timer);
                 timer=undefined;
             }
+        }
+
+        function showTestResults() {
+            $scope.$apply();
+            $('#view-test-results-modal')
+                .modal({
+                    onHidden: function () {
+                    },
+                    closable: false
+                })
+                .modal('show');
+
         }
     }
 })();

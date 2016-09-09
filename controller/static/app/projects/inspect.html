@@ -5,15 +5,22 @@
     <a class="item" style="background-color: #006E93">
         <h4 class="ui header" style="color: white"><i class="clock icon"></i>Project History For:</h4>
         <h4 class="ui header" style="color: white">
-            <i class="circle icon" ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'grey' : 'red'"></i>
+            <i class="circle icon"
+               ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'grey' : 'red'"></i>
             {{vm.proj.$$state.value.name}}
         </h4>
     </a>
     <div class="item">
         <div class="column" style="overflow-y:scroll; height: 550px">
-        <div class="active item" ng-repeat="test in vm.results.testResults" jquery>
-            <i class="circle icon" ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'grey' : 'red'"></i>{{test.buildId}}
-        </div>
+            <div class="active item" ng-repeat="test in vm.results.testResults" jquery>
+                <i class="circle icon"
+                   ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'grey' : 'red'"></i>
+
+                <div ui-sref="dashboard.buildResults({projectId: vm.results.projectId, testId: test.testId, buildId: test.buildId, imageId: test.dockerImageId})"
+                     style=":hover;text-decoration: underline; cursor: pointer">
+                    {{test.buildId | limitTo:20}}
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -32,24 +39,31 @@
                     </span>
                     <div class="column row">
                         <div class="column">
-                            <div id="history-project-inspect-view" ng-click="vm.showProjectHistory()" class="ui small blue labeled icon button">
+                            <div id="history-project-inspect-view" ng-click="vm.showProjectHistory()"
+                                 class="ui small blue labeled icon button">
                                 <i class="clock icon"></i> Project History
 
-                                    <tr ng-repeat="test in vm.results.testResults" jquery>
+                                <tr ng-repeat="test in vm.results.testResults" jquery>
 
                             </div>
                             <span ng-show="!vm.refresh" style="float: right">
-                                <a id="auto-refresh-enabled" ng-click="vm.startRefresh(vm.results.projectId)" style="color: #006D95; cursor: pointer; font-weight: bold">Auto Refresh <i class="refresh icon"></i></a>
+                                <a id="auto-refresh-enabled" ng-click="vm.startRefresh(vm.results.projectId)"
+                                   style="color: #006D95; cursor: pointer; font-weight: bold">Auto Refresh <i
+                                        class="refresh icon"></i></a>
                             </span>
                             <span ng-show="vm.refresh" style="float: right">
-                                <a id="auto-refresh-disabled" ng-click="vm.cancelRefresh()" style="color: darkgray; cursor: pointer; font-weight: bold">Auto Refresh <i class="stop icon"></i></a>
+                                <a id="auto-refresh-disabled" ng-click="vm.cancelRefresh()"
+                                   style="color: darkgray; cursor: pointer; font-weight: bold">Auto Refresh <i
+                                        class="stop icon"></i></a>
                             </span>
                             <h3 class="ui header">
                                 <span id="inspect-go-to-projects" style="float: right">
-                                    <a ui-sref="dashboard.projects" style="color: #006D95">Go To Projects <i class="sign out icon"></i></a>
+                                    <a ui-sref="dashboard.projects" style="color: #006D95">Go To Projects <i
+                                            class="sign out icon"></i></a>
                                 </span>
                                 <div class="content">
-                                    <i class="circle icon" ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'grey' : 'red'"></i>
+                                    <i class="circle icon"
+                                       ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'grey' : 'red'"></i>
                                     Project Results
                                 </div>
                             </h3>
@@ -138,7 +152,8 @@
                                     <tbody>
                                     <tr ng-repeat="image in vm.results.testResults" jquery>
                                         <td>
-                                            <i class="circle icon" ng-class="image.status == 'finished_success' ? 'green' : image.status == 'finished_failed' ? 'red' : 'grey'"></i>
+                                            <i class="circle icon"
+                                               ng-class="image.status == 'finished_success' ? 'green' : image.status == 'finished_failed' ? 'red' : 'grey'"></i>
                                             <span class="hidden">{{image.status}}</span>
                                         </td>
                                         <td>{{image.imageId | limitTo:12}}</td>
@@ -152,7 +167,10 @@
                                             </div>
                                         </span></td>
                                         <td class="collapsing">
-                                            <div id="inspect-view-image-results" ui-sref="dashboard.buildResults({projectId: vm.results.projectId, testId: image.testId, buildId: image.buildId, imageId: image.dockerImageId})" class="basic compact blue ui icon button"  ng-class="{disabled: image.istestResult}">
+                                            <div id="inspect-view-image-results"
+                                                 ui-sref="dashboard.buildResults({projectId: vm.results.projectId, testId: image.testId, buildId: image.buildId, imageId: image.dockerImageId})"
+                                                 class="basic compact blue ui icon button"
+                                                 ng-class="{disabled: image.istestResult}">
                                                 <i class="search icon"></i>
                                             </div>
                                             <div class="basic compact blue ui icon button">
@@ -194,7 +212,8 @@
                                     <tbody>
                                     <tr ng-repeat="test in vm.results.testResults" jquery>
                                         <td>
-                                            <i class="circle icon" ng-class="test.status == 'finished_success' ? 'green' : test.status == 'finished_failed' ? 'red' : 'grey'"></i>
+                                            <i class="circle icon"
+                                               ng-class="test.status == 'finished_success' ? 'green' : test.status == 'finished_failed' ? 'red' : 'grey'"></i>
                                             <span class="hidden">{{test.status}}</span>
                                         </td>
                                         <td id="inspect-view-test-id">{{test.testId | limitTo:12}}</td>
@@ -216,7 +235,10 @@
                                             </div>
                                         </span></td>
                                         <td class="collapsing">
-                                            <div id="inspect-view-test-results" ui-sref="dashboard.buildResults({projectId: vm.results.projectId, testId: test.testId, buildId: test.buildId, imageId: test.dockerImageId})" class="basic compact blue ui icon button"  ng-class="{disabled: test.istestResult}">
+                                            <div id="inspect-view-test-results"
+                                                 ui-sref="dashboard.buildResults({projectId: vm.results.projectId, testId: test.testId, buildId: test.buildId, imageId: test.dockerImageId})"
+                                                 class="basic compact blue ui icon button"
+                                                 ng-class="{disabled: test.istestResult}">
                                                 <i class="search icon"></i>
                                             </div>
                                             <div class="basic compact blue ui icon button">
@@ -230,8 +252,129 @@
                         </div>
                     </div>
 
+                    <div class="ui padded grid">
+                        <div class="row">
+                            <div class="column">
+                                <div class="ui dividing header"></div>
+                                <div class="six fields">
+                                    <div class="field">
+                                        <h5>New Results Table</h5>
+                                    </div>
+                                </div>
+                                <table class="ui sortable celled table">
+                                    <thead>
+                                    <tr>
+                                        <th>Test Results</th>
+                                        <th>Image Name</th>
+                                        <th>Image ID</th>
+                                        <th>Image Tag</th>
+                                        <th>Description</th>
+                                        <th>Location</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="image in vm.images" jquery>
+                                        <td>
+                                            <div class="field">
+                                                <div class="item">
+                                                    <div class="row">
+                                                        <div class="left column">
+                                                            <div  ng-click="vm.showTestResults()" style= "cursor: pointer">
+                                                                <i class="plus icon"></i>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>{{image.name}}</td>
+                                        <td>{{image.id | limitTo:12}}</td>
+                                        <td>{{image.tag}}</td>
+                                        <td>{{image.description}}</td>
+                                        <td>{{image.location}}</td>
+
+                                    </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<div id="view-test-results-modal" class="ui modal" style="width: auto; height: auto; align-content: center">
+
+
+    <div class="header" id="create-test-view-header">Test Results</div>
+    <div class="content">
+        <div class="ui padded grid">
+            <div class="row">
+                <div class="column">
+                    <div class="ui dividing header"></div>
+                    <div class="six fields">
+                        <div class="field">
+                            <h5>New Test Results</h5>
+                        </div>
+                    </div>
+                    <table class="ui sortable celled table">
+                        <thead>
+                        <tr>
+                            <th class="collapsing"><i class="heartbeat icon"></i></th>
+                            <th>Test Name</th>
+                            <th>Test Id</th>
+                            <th>Build Id</th>
+                            <th>Execution Date</th>
+                            <th>End Date</th>
+                            <th>Applied tag</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="test in vm.results.testResults" jquery>
+                            <td>
+                                <i class="circle icon"
+                                   ng-class="test.status == 'finished_success' ? 'green' : test.status == 'finished_failed' ? 'red' : 'grey'"></i>
+                                <span class="hidden">{{test.status}}</span>
+                            </td>
+                            <td>{{test.testName}}</td>
+                            <td>{{test.testId | limitTo:12}}</td>
+                            <td>{{test.buildId | limitTo:12}}</td>
+                            <td>{{test.date}}</td>
+                            <td>{{test.endDate}}</td>
+                            <td><span ng-repeat="tag in test.appliedTag">
+                                            <div class="ui label">
+                                                {{tag}}
+                                            </div>
+                    </span></td>
+
+                            <td class="collapsing">
+                                <div
+                                        ui-sref="dashboard.buildResults({projectId: vm.results.projectId, testId: test.testId, buildId: test.buildId, imageId: test.dockerImageId})"
+                                        class="basic compact blue ui icon button"
+                                        ng-class="{disabled: test.istestResult}">
+                                    <i class="search icon"></i>
+                                </div>
+                                <div class="basic compact blue ui icon button">
+                                    <i class="file text icon"></i>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="actions">
+        <div class="ui negative button">
+            Close
         </div>
     </div>
 </div>
