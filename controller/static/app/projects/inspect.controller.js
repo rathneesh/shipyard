@@ -22,6 +22,9 @@
 
         vm.refresh = false;
         var timer = undefined;
+        var imageBuildIds = [];
+        var imageIds = [];
+        vm.images = [];
 
         $scope.$on('ngRepeatFinished', function() {
             $('.ui.sortable.celled.table').tablesort();
@@ -37,11 +40,26 @@
 
         listImages($stateParams.id);
         vm.proj = ProjectService.getProjectByID(vm.results.projectId);
+        vm.getImageIds = getImageIds;
+        vm.getImageBuildIds = getImageBuildIds;
+        vm.testedImage = testedImage;
 
         angular.forEach(vm.results.testResults, function (result, key) {
             testResults(vm.results.projectId,result.testId,result.buildId).then(function (response) {
                 vm.results[key].istestResult = response;
             })
+        });
+
+
+        $('#close-test-results-modal').on('click', function () {
+            $(".ui.fullscreen.modal.transition.view.results").modal('hide');
+        });
+
+
+        $('#build-results-link').on('click', function () {
+            $('#inspect-project-history-' + vm.results.projectId)
+                .sidebar('toggle')
+            ;
         });
 
         function showProjectHistory() {
@@ -103,7 +121,39 @@
                     closable: false
                 })
                 .modal('show');
-
         }
+
+        function getImageBuildIds() {
+            for (var key in vm.results.testResults) {
+                imageBuildIds.push(vm.results.testResults[key].imageId);
+            }
+        }
+
+        function getImageIds() {
+            for (var image in vm.images) {
+                imageIds.push(vm.images[image].id);
+            }
+        }
+
+        function testedImage() {
+            getImageBuildIds();
+            getImageIds();
+            for (var i = 0; i < imageIds.length; i++) {
+                containsObj(imageIds[i], imageBuildIds);
+            }
+        }
+
+        function containsObj(obj, list) {
+            var i;
+            for (i = 0; i < list.length; i++) {
+                if (list[i] === obj) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+
     }
 })();
