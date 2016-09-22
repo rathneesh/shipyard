@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ilm-backend
+  labels:
+    app: ilm-backend
+spec:
+  selector:
+    app: ilm-database
+  ports:
+  - name: rethink-ui
+    port: 8083
+    targetPort: 8080
+    protocol: TCP
+  - name: rethink1
+    port: 8084
+    targetPort: 28015
+    protocol: TCP
+  - name: rethink2
+    port: 8085
+    targetPort: 29015
+    protocol: TCP

@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: controller
+  labels:
+    app: ilm-shipyard
+spec:
+  restartPolicy: Never
+  containers:
+  -
+    name: proxy
+    image: ehazlett/docker-proxy:latest
+    ports:
+      - containerPort: 2375
+        hostPort: 2376
+    volumeMounts:
+      - mountPath: /var/run/docker.sock
+        name: proxy-storage
+    args: ["-D"]
+
+  -
+    name: controller
+    image: ilmhpe/ilm:dev
+    ports:
+      - containerPort: 8080
+        hostPort: 8082
+      - containerPort: 9279
+        hostPort: 9279
+    volumeMounts:
+      - mountPath: /var/run/docker.sock
+        name: proxy-storage
+    command: ["/bin/bash"]
+    args: ["-c", "sleep 30 && ./shipyard -D server --rethinkdb-addr $ILM_BACKEND_SERVICE_HOST:8084 -d tcp://localhost:2375"]
+    env:
+      - name: CLAIR_ENDPOINT
+        value: http://localhost:6060
+
+  -
+    name: clair
+    image: quay.io/eedevops/clair:ilm-v1.0.1
+    ports:
+      - containerPort: 6060
+      - containerPort: 6061
+    volumeMounts:
+      - mountPath: /config
+        name: clair-storage1
+        readOnly: true
+      - mountPath: /tmp
+        name: clair-storage2
+    command: ["/bin/bash"]
+    args: ["-c", "sleep 30 && clair --config=/config/config.yaml"]
+  -
+    name: postgres
+    image: postgres:9.4.5
+    ports:
+      - containerPort: 5432
+        hostPort: 5432
+    volumeMounts:
+      - mountPath: /var/lib/postgresql/data/pgdata
+        name: postgres-storage
+    env:
+      - name: "PGDATA"
+        value: "/var/lib/postgresql/data/pgdata"
+      - name: "POSTGRES_PASSWORD"
+        value: "postgres"
+  volumes:
+    -
+      name: postgres-storage
+      hostPath:
+        path: /tmp/postgres
+    -
+      name: clair-storage1
+      hostPath:
+        path: /etc/clair_config
+    -
+      name: clair-storage2
+      hostPath:
+        path: /tmp/clair-data
+    -
+      name: proxy-storage
+      hostPath:
+        path: /var/run/docker.sock
+
