@@ -52,7 +52,7 @@
         vm.buildMessageConfig = {
             testId: ''
         };
-
+        vm.latestBuild = {};
         vm.saveProjectMessageConfig = {
             status: 'hidden' // 'hidden' 'success' 'failure'
         };
@@ -104,20 +104,22 @@
         vm.cancelEditSaveImage = cancelEditSaveImage;
         vm.enableSaveProject = enableSaveProject;
         vm.isProjectBuilt = isProjectBuilt;
+        vm.isTestBuilt = isTestBuilt;
         vm.getDockerHubTags = getDockerHubTags;
 
         vm.getRegistries();
         vm.getImages(vm.project.id);
         vm.getTests(vm.project.id);
         vm.isProjectBuilt(vm.project.id);
-
+        vm.showTestResults = showTestResults;
+        vm.getTestResults = getTestResults(vm.project.id);
         vm.randomCreateId = null;
         vm.randomEditId = null;
         vm.randomCreateTestId = null;
         vm.randomEditTestId = null;
         vm.deleteImageId =  null;
         vm.deleteTestId = null;
-
+        vm.res = [];
         function makeId() {
             var text = "";
             var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -941,5 +943,35 @@
                 });
         }
 
+        function isTestBuilt(projectId, testId, buildId) {
+            return ProjectService.pollBuild(projectId, testId, buildId)
+                .then(function(data) {
+                    vm.isTestBuild = true;
+                }, function(data) {
+                    vm.isTestBuild = false;
+                });
+        }
+
+        function getTestResults(id) {
+            return ProjectService.results(id)
+                .then(function (data) {
+                    vm.res = data;
+                    vm.latestBuild = vm.res.testResults[vm.res.testResults.length - 1];
+
+                }, function (data) {
+                    return false;
+                });
+        }
+
+        function showTestResults() {
+            $scope.$apply();
+            $('#view-test-results-modal')
+                .modal({
+                    onHidden: function () {
+                    },
+                    closable: false
+                })
+                .modal('show');
+        }
     }
 })();
