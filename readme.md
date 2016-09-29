@@ -70,5 +70,8 @@ To run the test suite:
 
 * run `docker-compose -f docker-compose.yml -f docker-compose.test.yml up`
 
+# Tracking
+By default, Shipyard provides a mechanism for tracking user activity. ILM uses this feature by redirecting the same POST call to calculate and return usage statistics. You can turn this feature off, by appending the `--disable-usage-info` flag to the `controller`'s `command` in the `docker-compose.yml` file.
+
 # License
 Shipyard is licensed under the Apache License, Version 2.0. See LICENSE for full license text.

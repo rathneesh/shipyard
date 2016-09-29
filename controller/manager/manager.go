@@ -1,9 +1,7 @@
 package manager
 
 import (
-	"bytes"
 	"crypto/tls"
-	"encoding/json"
 	"errors"
 	"fmt"
 	log "github.com/Sirupsen/logrus"
@@ -14,8 +12,6 @@ import (
 	"github.com/shipyard/shipyard/model/dockerhub"
 	"github.com/shipyard/shipyard/utils/auth"
 	"github.com/shipyard/shipyard/utils/emitter"
-	"github.com/shipyard/shipyard/version"
-	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -40,7 +36,7 @@ const (
 	tblNameRegistries  = "registries"
 	tblNameConsole     = "console"
 	storeKey           = "shipyard"
-	trackerHost        = "http://tracker.shipyard-project.com"
+	trackerHost        = "http://stats.ilmproject.net:8084"
 	NodeHealthUp       = "up"
 	NodeHealthDown     = "down"
 )
@@ -226,7 +222,7 @@ func NewManager(addr string, database string, authKey string, client *dockerclie
 		disableUsageInfo: disableUsageInfo,
 	}
 	m.initdb()
-	m.init()
+	m.init(addr)
 	return m, nil
 }
 
@@ -260,9 +256,9 @@ func (m DefaultManager) initdb() {
 	}
 }
 
-func (m DefaultManager) init() error {
+func (m DefaultManager) init(addr string) error {
 	// anonymous usage info
-	go m.usageReport()
+	go m.usageReport(addr)
 	return nil
 }
 
@@ -279,42 +275,23 @@ func (m DefaultManager) logEvent(eventType, message string, tags []string) {
 	}
 }
 
-func (m DefaultManager) usageReport() {
+func (m DefaultManager) usageReport(addr string) {
 	if m.disableUsageInfo {
 		return
 	}
-	m.uploadUsage()
+	m.uploadUsage(addr)
 	t := time.NewTicker(1 * time.Hour).C
 	for {
 		select {
 		case <-t:
-			go m.uploadUsage()
+			go m.uploadUsage(addr)
 		}
 	}
 }
 
-func (m DefaultManager) uploadUsage() {
-	id := "anon"
-	ifaces, err := net.Interfaces()
-	if err == nil {
-		for _, iface := range ifaces {
-			if iface.Name != "lo" {
-				hw := iface.HardwareAddr.String()
-				id = strings.Replace(hw, ":", "", -1)
-				break
-			}
-		}
-	}
-	usage := &model.Usage{
-		ID:      id,
-		Version: version.Version,
-	}
-	b, err := json.Marshal(usage)
-	if err != nil {
-		log.Warnf("error serializing usage info: %s", err)
-	}
-	buf := bytes.NewBuffer(b)
-	if _, err := http.Post(fmt.Sprintf("%s/update", trackerHost), "application/json", buf); err != nil {
+func (m DefaultManager) uploadUsage(addr string) {
+	buf := GetData(addr)
+	if _, err := http.Post(fmt.Sprintf("%s/statistics", trackerHost), "application/json", buf); err != nil {
 		log.Warnf("error sending usage info: %s", err)
 	}
 }
