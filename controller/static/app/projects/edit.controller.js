@@ -104,7 +104,6 @@
         vm.cancelEditSaveImage = cancelEditSaveImage;
         vm.enableSaveProject = enableSaveProject;
         vm.isProjectBuilt = isProjectBuilt;
-        vm.isTestBuilt = isTestBuilt;
         vm.getDockerHubTags = getDockerHubTags;
 
         vm.getRegistries();
@@ -112,7 +111,10 @@
         vm.getTests(vm.project.id);
         vm.isProjectBuilt(vm.project.id);
         vm.showTestResults = showTestResults;
-        vm.getTestResults = getTestResults(vm.project.id);
+        vm.getTestBuildResults = getTestBuildResults;
+        vm.getBuildsForTest = getBuildsForTest;
+        vm.buildsForATest = [];
+        vm.selectedId = null;
         vm.randomCreateId = null;
         vm.randomEditId = null;
         vm.randomCreateTestId = null;
@@ -120,6 +122,16 @@
         vm.deleteImageId =  null;
         vm.deleteTestId = null;
         vm.res = [];
+        vm.buildTestsList = [];
+        angular.forEach(vm.res.testResults, function (result, key) {
+            getTestBuildResults(vm.res.projectId, result.testId, result.buildId).then(function (response) {
+                vm.res[key].istestResult = response;
+                vm.buildTestsList.push(vm.res.testResults[key].testId)
+
+            })
+        });
+
+
         function makeId() {
             var text = "";
             var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -129,6 +141,16 @@
 
             return text;
         }
+
+        $(".ui.fullscreen.modal.transition.view.results").on('keyup', function (evt) {
+            if (evt.keyCode == 27) {
+                $(".ui.fullscreen.modal.transition.view.results").modal('hide');
+            }
+        });
+
+        $("#inspect-view-test-results").on('click', function () {
+            $(".ui.fullscreen.modal.transition.view.results").modal('hide');
+        });
 
         $(".ui.fullscreen.modal.transition.create.image").on('keyup',function(evt) {
             if (evt.keyCode == 27) {
@@ -219,7 +241,7 @@
                     var tagObject = $.grep(vm.publicRegistryTags, function (tag) {
                         return tag.name == value;
                     })[0];
-                    
+
                     if (tagObject)
                         vm.createImage.tagLayer = tagObject.hasOwnProperty('layer')? tagObject.layer : '';
 
@@ -243,7 +265,7 @@
                 onChange: function(value, text, $selectedItem) {
                     vm.editImage.tag = value.toString();
                     checkImagePublicRepository(vm.editImage);
-                    
+
                     // Search for the image layer of the chosen tag
                     // TODO: find a way to save the layer when the user clicks on the tag name
                     var tagObject = $.grep(vm.publicRegistryTags, function (tag) {
@@ -367,7 +389,7 @@
                }
             });
 
-        
+
         var createSelectizeObj = null;
         vm.createTest.selectizeConfig = {
             create: true,
@@ -943,13 +965,8 @@
                 });
         }
 
-        function isTestBuilt(projectId, testId, buildId) {
-            return ProjectService.pollBuild(projectId, testId, buildId)
-                .then(function(data) {
-                    vm.isTestBuild = true;
-                }, function(data) {
-                    vm.isTestBuild = false;
-                });
+        function isTestBuilt(id) {
+            vm.testBuild = vm.buildTestsList.indexOf(id) != 1;
         }
 
         function getTestResults(id) {
@@ -963,7 +980,28 @@
                 });
         }
 
-        function showTestResults() {
+        function getBuildsForTest(id) {
+            for (var test in vm.res.testResults) {
+                if (test.testId == id) {
+                    vm.buildsForATest.push(test);
+                }
+            }
+
+        }
+
+        function getTestBuildResults(projectId, testId, buildId) {
+            return ProjectService.buildResults(projectId, testId, buildId)
+                .then(function (data) {
+                    return true;
+                }, function (data) {
+                    return false;
+                });
+        }
+
+        function showTestResults(id) {
+            vm.selectedId = id;
+            vm.getTestResults = getTestResults(vm.project.id);
+            vm.isTestBuilt = isTestBuilt(id);
             $scope.$apply();
             $('#view-test-results-modal')
                 .modal({
