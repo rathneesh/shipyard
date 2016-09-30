@@ -52,7 +52,7 @@
         vm.buildMessageConfig = {
             testId: ''
         };
-        vm.latestBuild = {};
+        vm.latestBuildId = null;
         vm.saveProjectMessageConfig = {
             status: 'hidden' // 'hidden' 'success' 'failure'
         };
@@ -123,6 +123,8 @@
         vm.deleteTestId = null;
         vm.res = [];
         vm.buildTestsList = [];
+        vm.isTestBuilt = isTestBuilt;
+
         angular.forEach(vm.res.testResults, function (result, key) {
             getTestBuildResults(vm.res.projectId, result.testId, result.buildId).then(function (response) {
                 vm.res[key].istestResult = response;
@@ -966,15 +968,18 @@
         }
 
         function isTestBuilt(id) {
-            vm.testBuild = vm.buildTestsList.indexOf(id) != 1;
+            if (vm.buildTestsList.indexOf(id) != -1) return true;
+            return false;
         }
 
         function getTestResults(id) {
             return ProjectService.results(id)
                 .then(function (data) {
                     vm.res = data;
-                    vm.latestBuild = vm.res.testResults[vm.res.testResults.length - 1];
-
+                    vm.latestBuildId= vm.res.testResults[vm.res.testResults.length - 1].buildId;
+                    for (var test in vm.res.testResults) {
+                        vm.buildTestsList.push(test.testId)
+                    }
                 }, function (data) {
                     return false;
                 });

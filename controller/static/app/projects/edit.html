@@ -1014,7 +1014,7 @@
 <div id="view-test-results-modal" class="ui fullscreen modal transition view results">
 
 
-    <div class="header" id="create-test-view-header">Results for the latest build</div>
+    <div class="header" id="create-test-view-header">Latest build results</div>
     <div class="content">
         <div class="ui padded grid">
             <div class="row">
@@ -1038,11 +1038,10 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr ng-repeat="test in vm.filteredImages = (vm.res.testResults | filter: vm.selectedId)" jquery>
-
+                        <tr ng-repeat="test in vm.filteredImages = (vm.res.testResults | filter: vm.selectedId | filter: vm.latestBuildId)" jquery>
 
                             <td>
-                                <i class="circle icon" ng-class="vm.latestBuild.status == 'finished_success' ? 'green' : vm.latestBuild.status == 'finished_failed' ? 'red' : 'grey'"></i>
+                                <i class="circle icon" ng-class="test.status == 'finished_success' ? 'green' : test.status == 'finished_failed' ? 'red' : 'grey'"></i>
                                 <span class="hidden">{{test.status}}</span>
                             </td>
                             <td>{{test.imageName}}</td>
