@@ -61,10 +61,12 @@
 
         vm.createImageTagSpin = false;
         vm.editImageTagSpin = false;
-
+        vm.buildTestsList = [];
+        var buildsForATest = [];
+        vm.selectedId = null;
         vm.createSaveImage = createSaveImage;
         vm.editSaveImage   = editSaveImage;
-
+        vm.getTestResults = getTestResults;
         vm.createSaveTest = createSaveTest;
 
         vm.list = list;
@@ -109,27 +111,22 @@
         vm.getRegistries();
         vm.getImages(vm.project.id);
         vm.getTests(vm.project.id);
+        vm.res = [];
         vm.isProjectBuilt(vm.project.id);
         vm.showTestResults = showTestResults;
         vm.getTestBuildResults = getTestBuildResults;
         vm.getBuildsForTest = getBuildsForTest;
-        vm.buildsForATest = [];
-        vm.selectedId = null;
+        vm.isTestBuilt = isTestBuilt;
         vm.randomCreateId = null;
         vm.randomEditId = null;
         vm.randomCreateTestId = null;
         vm.randomEditTestId = null;
         vm.deleteImageId =  null;
         vm.deleteTestId = null;
-        vm.res = [];
-        vm.buildTestsList = [];
-        vm.isTestBuilt = isTestBuilt;
 
         angular.forEach(vm.res.testResults, function (result, key) {
             getTestBuildResults(vm.res.projectId, result.testId, result.buildId).then(function (response) {
                 vm.res[key].istestResult = response;
-                vm.buildTestsList.push(vm.res.testResults[key].testId)
-
             })
         });
 
@@ -894,6 +891,7 @@
                 }, function(data) {
                     vm.error = data;
                 });
+            getBuildsForTest(testId);
         }
 
         function pollBuild(projectId, testId, buildId) {
@@ -973,25 +971,23 @@
         }
 
         function getTestResults(id) {
+            console.log("enter Get Test Results");
             return ProjectService.results(id)
                 .then(function (data) {
                     vm.res = data;
-                    vm.latestBuildId= vm.res.testResults[vm.res.testResults.length - 1].buildId;
-                    for (var test in vm.res.testResults) {
-                        vm.buildTestsList.push(test.testId)
-                    }
                 }, function (data) {
                     return false;
                 });
         }
 
-        function getBuildsForTest(id) {
+        function getBuildsForTest(testid) {
             for (var test in vm.res.testResults) {
-                if (test.testId == id) {
-                    vm.buildsForATest.push(test);
+                if (vm.res.testResults[test].testId == testid) {
+                    buildsForATest.push(vm.res.testResults[test]);
+                    vm.buildTestsList.push(vm.res.testResults[test].testId);
                 }
             }
-
+            vm.latestBuildId = buildsForATest[buildsForATest.length - 1].buildId;
         }
 
         function getTestBuildResults(projectId, testId, buildId) {
@@ -1005,8 +1001,7 @@
 
         function showTestResults(id) {
             vm.selectedId = id;
-            vm.getTestResults = getTestResults(vm.project.id);
-            vm.isTestBuilt = isTestBuilt(id);
+            getTestResults(vm.project.id);
             $scope.$apply();
             $('#view-test-results-modal')
                 .modal({
