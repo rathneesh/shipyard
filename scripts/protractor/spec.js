@@ -348,6 +348,7 @@ describe('ILM', function() {
         expect(element(sy.editTestHeader).getText()).toEqual(config.testName);
         element(sy.editTestDisplayName).clear();
         element(sy.editTestDisplayName).sendKeys(config.testNameEdit);
+        browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.editTestDisplayName).getText(), 60000));
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.editTestApply), 60000));
         element(sy.editTestApply).click();
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.editProjectList.row(0)), 60000));
@@ -471,6 +472,7 @@ describe('ILM', function() {
         console.log("get to edit project view by clicking on the edit action item");
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.projectListTableOfProjects.row(0)), 60000));
         var editProject = element(sy.projectListTableOfProjects.row(0));
+        browser.wait(protractor.ExpectedConditions.visibilityOf(editProject.element(by.className('wrench icon'))), 60000);
         editProject.element(by.className('wrench icon')).click();
         browser.wait(protractor.ExpectedConditions.visibilityOf(editProject.element(by.css('i[class="black edit icon"]'))), 60000);
         editProject.element(by.css('i[class="black edit icon"]')).click();
@@ -481,7 +483,8 @@ describe('ILM', function() {
         console.log("delete image");
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.createImageList.row(0)), 60000));
         var imageDetails = element(sy.createImageList.row(0));
-        imageDetails.element(by.css('i[class="trash icon"]')).click();
+        browser.wait(protractor.ExpectedConditions.visibilityOf(element(by.id('delete-image-icon')), 60000));
+        imageDetails.element(by.id('delete-image-icon')).click();
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.deleteImageHeader), 60000));
         expect(element(sy.deleteImageHeader).getText()).toEqual("Delete Image: "+config.imageName);
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.deleteImageButton), 60000));
@@ -494,7 +497,8 @@ describe('ILM', function() {
         console.log("delete test");
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.editProjectList.row(0)), 60000));
         var testDetails = element(sy.editProjectList.row(0));
-        testDetails.element(by.css('i[class="trash icon"]')).click();
+        browser.wait(protractor.ExpectedConditions.visibilityOf(element(by.id('delete-test-icon')), 60000));
+        testDetails.element(by.id('delete-test-icon')).click();
         expect(element(sy.deleteTestHeader).getText()).toEqual("Delete Test: "+config.testNameEdit);
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.deleteTestButton), 60000));
         element(sy.deleteTestButton).click();
@@ -507,6 +511,7 @@ describe('ILM', function() {
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.editProjectGoToProjectsButton), 60000));
         element(sy.editProjectGoToProjectsButton).click();
         var deleteProject = element(sy.projectListTableOfProjects.row(0));
+        browser.wait(protractor.ExpectedConditions.visibilityOf(element(by.className('wrench icon')), 60000));
         deleteProject.element(by.className('wrench icon')).click();
         browser.wait(protractor.ExpectedConditions.visibilityOf(deleteProject.element(by.css('i[class="black trash icon"]'))), 60000);
         deleteProject.element(by.id('delete-project-icon')).click();
