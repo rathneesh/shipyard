@@ -140,6 +140,7 @@ type (
 		GetBuildById(buildId string) (*model.Build, error)
 		GetBuildStatus(projectId string, testId string, buildId string) (string, error)
 		GetBuildResults(projectId string, testId string, buildId string) ([]*model.BuildResult, error)
+		GetBuildResultsTable(projectId string, testId string, buildId string, imageId string) (model.Artifact, map[string]map[string][]model.BuildVulnerability, string, error)
 
 		CreateAllBuilds(projectId string, WsEmmitter *emitter.Emitter) (string, error)
 		CreateBuild(projectId string, testId string, buildAction *model.BuildAction, report chan string) (string, error)

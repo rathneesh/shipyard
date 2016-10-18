@@ -7,21 +7,50 @@
                     <a ui-sref="dashboard.inspect_project({id:$stateParams.projectId})" style="color: #006D95">Go To Project Results <i class="sign out icon"></i></a>
                     </span>
                     <div class="content">
-                    Clair report for {{vm.results[0].targetArtifact.type}} {{vm.results[0].targetArtifact.artifact.name}}:{{vm.results[0].targetArtifact.artifact.tag}}
+                        Clair report for image {{vm.artifact.Name}}:{{vm.artifact.Tag}}
                     </div>
                 </h3>
             </div>
             <div class="ui segment page">
                 <div class="ui feed">
-                    <div class="event" ng-repeat="resultEntry in vm.results[0].resultEntries">
-                        <div class="content">
-                            <div class="summary" ng-style="resultEntry.toString().match('High') || resultEntry.toString().match('FAILURE') ? {'color':'red'} : resultEntry.toString().match('Medium') ? {'color':'orange'} : resultEntry.toString().match('Low') ? {'color':'#FBDB0C'} : resultEntry.toString().match('SUCCESS') ? {'color':'green'}: {'color':'black'}">
-                                {{resultEntry}}
-                            </div>
-                        </div>
+
+                    <table class="ui celled structured table" ng-if="vm.vulnerabilities.length !=0 ">
+                        <thead>
+                        <tr>
+                            <th rowspan="2">Layer</th>
+                            <th rowspan="2">Feature</th>
+                            <th colspan="4">Vulnerability</th>
+                        </tr>
+                        <tr>
+                            <th>Name</th>
+                            <th>Severity</th>
+                            <th>Link</th>
+                            <th>Description</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="element in vm.vulnerabilities">
+                            <td rowspan="{{ vm.noOfVulnerabilitiesForLayers[element.layer]}}" ng-if="element.showLayer">{{ element.layer }}</td>
+                            <td rowspan="{{ vm.noOfVulnerabilitiesForFeatures[element.feature]}}" ng-if="element.showFeature">{{ element.feature }}</td>
+                            <td>{{ element.vulnerability.VulName }}</td>
+                            <td ng-style="element.vulnerability.VulSeverity.match('High') ? {'color':'red'} : element.vulnerability.VulSeverity.match('Medium') ? {'color':'orange'} : element.vulnerability
+.VulSeverity.match('Low') ? {'color':'#FBDB0C'} : {'color':'black'}">{{ element.vulnerability.VulSeverity }}</td>
+                            <td><a href="{{ element.vulnerability.VulLink}}">{{ element.vulnerability.VulLink}}</a></td>
+                            <td>{{ element.vulnerability.VulDescription}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+
+
+                    <div class="summary" ng-style="vm.finalResults.toString().match('FAILURE') ? {'color':'red'} : vm.finalResults.toString().match('SUCCESS') ? {'color':'green'}: {'color':'black'}">
+                        <b>{{ vm.finalResults }}</b>
                     </div>
+
                 </div>
+
             </div>
+
+        </div>
         </div>
     </div>
-</div>

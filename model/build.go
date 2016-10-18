@@ -63,6 +63,18 @@ type BuildResult struct {
 	TimeStamp      time.Time       `json:"-" gorethink:"timeStamp,omitempty"`
 }
 
+type BuildVulnerability struct {
+	FeatureName string
+	FeatureVersion string
+	FeatureAddedBy string
+	VulName string
+	VulSeverity string
+	VulLink string
+	VulDescription string
+	VulFixedBy string
+	VulMetadata string
+}
+
 //type ResultEntry string
 
 func NewBuildResult(buildId string, artifact *TargetArtifact, results []string) *BuildResult {

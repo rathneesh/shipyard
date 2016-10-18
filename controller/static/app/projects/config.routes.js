@@ -58,8 +58,8 @@
                 controllerAs: 'vm',
                 authenticate: true,
                 resolve: {
-                    buildResults: ['ProjectService', '$state', '$stateParams', function(ProjectService, $state, $stateParams) {
-                        return ProjectService.buildResults($stateParams.projectId, $stateParams.testId, $stateParams.buildId, $stateParams.imageId).then(null, function(errorData) {
+                    buildResultsTable: ['ProjectService', '$state', '$stateParams', function(ProjectService, $state, $stateParams) {
+                        return ProjectService.buildResultsTable($stateParams.projectId, $stateParams.testId, $stateParams.buildId, $stateParams.imageId).then(null, function(errorData) {
                             $state.go('error');
                         });
                     }]

@@ -50,6 +50,19 @@
                     });
                 return promise;
             },
+            buildResultsTable: function(projectId, testId, buildId, imageId) {
+                canceller = $q.defer();
+                var promise = $http
+                    .get('/api/projects/' + projectId + '/tests/' + testId + '/builds/' + buildId + '/images/' + imageId + '/resultsTable', {timeout: canceller.promise})
+                    .then(function(response) {
+                        // Append imageId to the response so controllers can distinguish between results which have identical buildId's
+                        return {
+                            data: response.data,
+                            chosenImageId: imageId
+                        };
+                    });
+                return promise;
+            },
             cancel: function() {
               canceller.resolve();
             },
