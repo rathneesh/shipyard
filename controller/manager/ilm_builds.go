@@ -105,7 +105,7 @@ func (m DefaultManager) GetBuildResultsTable(projectId string, testId string, bu
 			break
 		}
 	}
-	//
+	
 	var layer string
 	lastFeature := "starting value"
 	vulnerabilities := map[string]map[string][]model.BuildVulnerability{}
