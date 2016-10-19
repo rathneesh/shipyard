@@ -110,10 +110,10 @@ func (m DefaultManager) GetBuildResultsTable(projectId string, testId string, bu
 	lastFeature := "starting value"
 	vulnerabilities := map[string]map[string][]model.BuildVulnerability{}
 	for _, resultLine := range result {
-		if strings.HasPrefix(resultLine, "Could not get features and vulnerabilities for layer of image") {
+		if strings.Contains(resultLine, "DB is being updated so no query to it can be done") {
 			return art, nil, resultLine, nil
 		} else if strings.HasPrefix(resultLine, "No features were found in image") {
-			return art, nil, result[0]+"\n"+result[1], nil
+			return art, nil, result[len(result)-2] + ", which typically means that the image is not supported by Clair.", nil
 		} else if strings.HasPrefix(resultLine, "Successfully analyzed layer") {
 			layer = strings.Split(strings.TrimLeft(resultLine, "Successfully analyzed layer: ")," using")[0]
 			vulnerabilities[layer] = map[string][]model.BuildVulnerability{}
