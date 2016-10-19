@@ -52,7 +52,7 @@
         vm.buildMessageConfig = {
             testId: ''
         };
-
+        vm.latestBuildId = null;
         vm.saveProjectMessageConfig = {
             status: 'hidden' // 'hidden' 'success' 'failure'
         };
@@ -61,10 +61,12 @@
 
         vm.createImageTagSpin = false;
         vm.editImageTagSpin = false;
-
+        vm.buildTestsList = [];
+        vm.selectedId = null;
+        vm.selectedTestName = null;
         vm.createSaveImage = createSaveImage;
         vm.editSaveImage   = editSaveImage;
-
+        vm.getTestResults = getTestResults;
         vm.createSaveTest = createSaveTest;
 
         vm.list = list;
@@ -109,14 +111,19 @@
         vm.getRegistries();
         vm.getImages(vm.project.id);
         vm.getTests(vm.project.id);
+        vm.res = [];
         vm.isProjectBuilt(vm.project.id);
-
+        vm.showTestResults = showTestResults;
+        vm.closeModal = closeModal;
+        vm.isTestBuilt = isTestBuilt;
         vm.randomCreateId = null;
         vm.randomEditId = null;
         vm.randomCreateTestId = null;
         vm.randomEditTestId = null;
         vm.deleteImageId =  null;
         vm.deleteTestId = null;
+
+        vm.getTestResults(vm.project.id);
 
         function makeId() {
             var text = "";
@@ -127,6 +134,12 @@
 
             return text;
         }
+
+        $(".ui.fullscreen.modal.transition.view.results").on('keyup', function (evt) {
+            if (evt.keyCode == 27) {
+                $(".ui.fullscreen.modal.transition.view.results").modal('hide');
+            }
+        });
 
         $(".ui.fullscreen.modal.transition.create.image").on('keyup',function(evt) {
             if (evt.keyCode == 27) {
@@ -217,7 +230,7 @@
                     var tagObject = $.grep(vm.publicRegistryTags, function (tag) {
                         return tag.name == value;
                     })[0];
-                    
+
                     if (tagObject)
                         vm.createImage.tagLayer = tagObject.hasOwnProperty('layer')? tagObject.layer : '';
 
@@ -241,7 +254,7 @@
                 onChange: function(value, text, $selectedItem) {
                     vm.editImage.tag = value.toString();
                     checkImagePublicRepository(vm.editImage);
-                    
+
                     // Search for the image layer of the chosen tag
                     // TODO: find a way to save the layer when the user clicks on the tag name
                     var tagObject = $.grep(vm.publicRegistryTags, function (tag) {
@@ -365,7 +378,7 @@
                }
             });
 
-        
+
         var createSelectizeObj = null;
         vm.createTest.selectizeConfig = {
             create: true,
@@ -868,6 +881,7 @@
                 }, function(data) {
                     vm.error = data;
                 });
+            vm.buildTestsList.push(testId);
         }
 
         function pollBuild(projectId, testId, buildId) {
@@ -941,5 +955,40 @@
                 });
         }
 
+        function isTestBuilt(id) {
+            if (!vm.buttonLoadStatus(id) && vm.buildTestsList.indexOf(id) != -1) return true;
+            return false;
+        }
+
+        function getTestResults(id, testid) {
+            var buildIdsForATest = [];
+            vm.buildTestsList = [];
+            return ProjectService.results(id)
+                .then(function (data) {
+                    vm.res = data;
+                    angular.forEach(vm.res.testResults, function (result, key) {
+                        vm.buildTestsList.push(vm.res.testResults[key].testId);
+                        if (vm.res.testResults[key].testId === testid) {
+                            buildIdsForATest.push(vm.res.testResults[key].buildId);
+                        }
+                    });
+                    vm.latestBuildId = buildIdsForATest[buildIdsForATest.length - 1];
+                }, function (data) {
+                    return false;
+                });
+        }
+
+        function showTestResults(id, name) {
+            vm.selectedId = id;
+            vm.selectedTestName = name;
+            vm.getBuildResultsId = makeId();
+            getTestResults(vm.project.id, id);
+            $scope.$apply();
+            $('#view-test-results-modal-'+vm.getBuildResultsId).modal('show');
+        }
+
+        function closeModal(){
+            $(".ui.fullscreen.modal.transition.view.results").modal('hide');
+        }
     }
 })();

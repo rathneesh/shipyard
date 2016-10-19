@@ -89,7 +89,10 @@ var sy = {
     inspectViewBuilds: by.repeater('test in vm.results.testResults'),
     inspectViewTestName: by.id('inspect-view-test-name'),
     inspectViewMagnifyingGlass: by.id('inspect-view-test-results'),
-    inspectProjectGoToProjectsButton: by.id('inspect-go-to-projects')
+    inspectProjectGoToProjectsButton: by.id('inspect-go-to-projects'),
+    showTestResults: by.className('ui fullscreen modal transition view results'),
+    testResultsHeader: by.id('create-test-view-header'),
+    latestBuildResults: by.repeater('test in vm.filteredImages = (vm.res.testResults | filter: vm.selectedId | filter: vm.latestBuildId)')
 };
 
 describe('ILM', function() {
@@ -372,6 +375,22 @@ describe('ILM', function() {
         expect(element(sy.editProjectLoadingMsg).getAttribute('class')).toBe('ui icon message negative');
     });
 
+    it('should be able to inspect the test we run', function () {
+        console.log("inspect the latest build results of the test we run");
+        browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.editProjectList.row(0)), 60000));
+        var inspectButton = element(sy.editProjectList.row(0));
+        browser.wait(protractor.ExpectedConditions.visibilityOf(inspectButton.element(by.css('i[class="search icon"]'))), 60000);
+        inspectButton.element(by.css('i[class="search icon"]')).click();
+        browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.showTestResults)), 60000);
+        expect(element(sy.showTestResults).isDisplayed()).toBe(true);
+        expect(element(sy.testResultsHeader).getText()).toEqual('Latest Build Results for ' + config.testNameEdit);
+        var buildResults = element(sy.latestBuildResults.row(0));
+        var res = buildResults.all(by.tagName('td'));
+        // Expect the test results to contain the name of the image we tested
+        expect(res.get(1).getText()).toEqual(config.imageName + ":latest");
+        element(by.id('close-build-results')).click();
+    });
+
     it('should be able return to project listing via the `Go To Projects` icon', function() {
         console.log("return to the project listing using the 'Go To Projects' action item");
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.editProjectGoToProjectsButton), 60000));
@@ -432,27 +451,6 @@ describe('ILM', function() {
         expect(element(by.id('edit-project')).getText()).toEqual('Edit Project');
         element(by.id('edit-project')).click();
         expect(element(sy.editProjectHeader).getText()).toEqual('Project ' + config.projectNameOnEdit);
-    });
-
-    it('should be able to inspect the test we run', function() {
-        console.log("inspect the results of the test we run");
-        browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.editProjectList.row(0)), 60000));
-        var inspectButton = element(sy.editProjectList.row(0));
-        browser.wait(protractor.ExpectedConditions.visibilityOf(inspectButton.element(by.css('i[class="search icon"]'))), 60000);
-        inspectButton.element(by.css('i[class="search icon"]')).click();
-        var inspectHeader = element(by.css('.ui.header .content'));
-        browser.wait(protractor.ExpectedConditions.visibilityOf(inspectHeader, 60000));
-        expect(inspectHeader.getText()).toEqual('Project Results');
-    });
-
-    it('should be able return from the inspect view to project listing via the `Go To Projects` icon', function() {
-        console.log("return to the project listing from the inspect view using the 'Go To Projects' action item");
-        browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.inspectProjectGoToProjectsButton), 60000));
-        // Click the `Go To Projects` button
-        element(sy.inspectProjectGoToProjectsButton).click();
-        var projectName = element.all(sy.projectListTableOfProjects).get(-1)
-            .element(by.css('#project-name'));
-        browser.wait(protractor.ExpectedConditions.visibilityOf(projectName, 60000));
     });
 
     it('should be able to execute test from project level', function() {
