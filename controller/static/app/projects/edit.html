@@ -988,7 +988,8 @@
                                             <div ng-class="{'loading': vm.buttonLoadStatus(test.id)}" ng-click="vm.startBuild(test.id)" class="basic compact blue ui icon button">
                                                 <i class="play icon"></i>
                                             </div>
-                                            <div ui-sref="dashboard.inspect_project({id: vm.project.id, projectName: vm.project.name})" class="basic compact blue ui icon button" ng-class="{disabled: !vm.isBuild}">
+                                            <div ng-click="vm.showTestResults(test.id, test.name)" class="basic compact blue ui icon button" ng-class="{disabled: !vm.isTestBuilt(test.id)}"
+                                                 style="cursor: pointer">
                                                 <i class="search icon"></i>
                                             </div>
                                             <div ng-click="vm.showDeleteTestDialog(test)" class="basic compact blue ui icon button">
@@ -1004,6 +1005,71 @@
 
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<div id="view-test-results-modal-{{vm.getBuildResultsId}}" class="ui fullscreen modal transition view results">
+    <i class="close icon"></i>
+    <div class="header" id="create-test-view-header">Latest Build Results for {{vm.selectedTestName}}</div>
+    <div class="content">
+        <div class="ui padded grid">
+            <div class="row">
+                <div class="column">
+                    <div class="six fields"></div>
+                    <table class="ui sortable celled table">
+                        <thead>
+                        <tr>
+                            <th class="collapsing"><i class="heartbeat icon"></i></th>
+                            <th>Image Name</th>
+                            <th>Image Id</th>
+                            <th>Build Id</th>
+                            <th>Docker Image Id</th>
+                            <th>Execution Date</th>
+                            <th>End Date</th>
+                            <th>Applied tag</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="test in vm.filteredImages = (vm.res.testResults | filter: vm.selectedId | filter: vm.latestBuildId)" jquery>
+
+                            <td>
+                                <i class="circle icon" ng-class="test.status == 'finished_success' ? 'green' : test.status == 'finished_failed' ? 'red' : 'grey'"></i>
+                                <span class="hidden">{{test.status}}</span>
+                            </td>
+                            <td>{{test.imageName}}</td>
+                            <td>{{test.imageId | limitTo:12}}</td>
+                            <td>{{test.buildId | limitTo:12}}</td>
+                            <td>{{test.dockerImageId | limitTo:12}}</td>
+                            <td>{{test.date}}</td>
+                            <td>{{test.endDate}}</td>
+                            <td><span ng-repeat="tag in test.appliedTag">
+                                            <div class="ui label">
+                                                {{tag}}
+                                            </div>
+                                        </span></td>
+                            <td class="collapsing">
+                                <div id="inspect-view-test-results"
+                                     ui-sref="dashboard.buildResults({projectId: vm.project.id, testId: test.testId, buildId: test.buildId, imageId: test.dockerImageId})"
+                                     class="actions basic compact blue ui icon button"
+                                     ng-class="{disabled: test.istestResult}" ng-click="vm.closeModal()">
+                                    <i class="search icon"></i>
+                                </div>
+                                <div class="basic compact blue ui icon button">
+                                    <i class="file text icon"></i>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="close-build-results" class="actions">
+        <div class="ui negative button">
+            Close
         </div>
     </div>
 </div>
