@@ -2,8 +2,9 @@
     <a class="item" style="background-color: #006E93">
         <h4 class="ui header" style="color: white"><i class="clock icon"></i>Project History For:</h4>
         <h4 class="ui header" style="color: white">
-            <i class="circle icon" ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'grey' : 'red'"></i>
-            {{vm.results.projectId}}
+            <i class="circle icon"
+               ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'grey' : 'red'"></i>
+            {{vm.proj.$$state.value.name}}
         </h4>
     </a>
     <div class="item">
@@ -57,16 +58,16 @@
                                     <h5 class="ui dividing header">Project Details</h5>
                                     <div class="six fields">
                                         <div class="field">
-                                            <label>Project ID: <span style="font-weight: normal">{{vm.results.projectId}}</span></label>
+                                            <label>Project Name: <span style="font-weight: normal">{{vm.proj.$$state.value.name}}</span></label>
+                                        </div>
+                                        <div class="field">
+                                            <label>Project ID: <span style="font-weight: normal">{{vm.results.projectId | limitTo:12}}</span></label>
                                         </div>
                                         <div class="field">
                                             <label>Description: <span style="font-weight: normal">{{vm.results.description}}</span></label>
                                         </div>
                                     </div>
                                     <div class="six fields">
-                                        <div class="field">
-                                            <label>Build ID: <span style="font-weight: normal">{{vm.results.buildId || '...'}}</span></label>
-                                        </div>
                                         <div class="field">
                                             <label>Run Date: <span style="font-weight: normal">{{vm.results.runDate || '...'}}</span></label>
                                         </div>

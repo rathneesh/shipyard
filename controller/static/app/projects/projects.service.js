@@ -101,7 +101,7 @@
                 }
 
                 cancelerGetPublicRegistryTags.resolve();
-                
+
                 return true;
             },
             getProviders: function() {
@@ -171,6 +171,14 @@
             addTest: function(projectId, test) {
                 var promise = $http
                     .post('/api/projects/' + projectId + '/tests', test)
+                    .then(function(response) {
+                        return response.data;
+                    });
+                return promise;
+            },
+            getProjectByID: function(projectId) {
+                var promise = $http
+                    .get('/api/projects/' + projectId)
                     .then(function(response) {
                         return response.data;
                     });
