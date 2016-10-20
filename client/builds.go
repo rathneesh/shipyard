@@ -106,3 +106,15 @@ func DeleteBuild(authHeader, url, projectId string, testId string, buildId strin
 	}
 	return nil
 }
+
+func GetRegistryInfo(authHeader, url, projectId string, testId string) error {
+	resp, err := sendRequest(authHeader, "GET", fmt.Sprintf("%s/api/projects/%s/tests/%s/registryInfo", url, projectId, testId), "")
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != http.StatusNoContent { //not ok
+		err = errors.New(resp.Status)
+		return err
+	}
+	return nil
+}

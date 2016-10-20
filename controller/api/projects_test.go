@@ -420,6 +420,9 @@ func TestAddProjectTest(t *testing.T) {
 			"s",
 			"f",
 			"",
+			"",
+			false,
+			false,
 		)
 		Convey("Then we should get a successful response", func() {
 			So(code, ShouldEqual, http.StatusCreated)
@@ -461,7 +464,7 @@ func TestExecuteProject(t *testing.T) {
 
 	Convey("When we make a request to create a new test", t, func() {
 
-		id, code, err := apiClient.CreateTest(SY_AUTHTOKEN, ts.URL, TEST1_NAME, TEST1_DESC, TEST_ARTIFACTS, TEST1_TYPE, "provider type", "provider name", "provider test", PROJECT_TO_RUN, []*model.Parameter{}, "success tag", "fail tag", "from tag")
+		id, code, err := apiClient.CreateTest(SY_AUTHTOKEN, ts.URL, TEST1_NAME, TEST1_DESC, TEST_ARTIFACTS, TEST1_TYPE, "provider type", "provider name", "provider test", PROJECT_TO_RUN, []*model.Parameter{}, "success tag", "fail tag", "from tag", "", false, false)
 
 		Convey("Then we get back a successful response", func() {
 			So(err, ShouldBeNil)

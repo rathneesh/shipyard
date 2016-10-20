@@ -79,6 +79,7 @@ var (
 	ErrRegistryDoesNotExist       = errors.New("registry does not exist")
 	ErrCannotPingRegistry         = errors.New("there was a problem connecting to registry")
 	ErrConsoleSessionDoesNotExist = errors.New("console session does not exist")
+	ErrPushFailed                 = errors.New("couldn't push the image to the registry")
 	store                         = sessions.NewCookieStore([]byte(storeKey))
 )
 

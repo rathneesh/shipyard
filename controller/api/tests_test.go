@@ -135,7 +135,7 @@ func TestCreateNewTest(t *testing.T) {
 
 		Convey("When we make a request to create a new test", func() {
 
-			id, code, err := apiClient.CreateTest(SY_AUTHTOKEN, ts.URL, TEST1_NAME, TEST1_DESC, nil, TEST1_TYPE, "provider type", "provider name", "provider test", PROJECT_WITH_TESTS_SAVED_ID, []*model.Parameter{}, "success tag", "fail tag", "from tag")
+			id, code, err := apiClient.CreateTest(SY_AUTHTOKEN, ts.URL, TEST1_NAME, TEST1_DESC, nil, TEST1_TYPE, "provider type", "provider name", "provider test", PROJECT_WITH_TESTS_SAVED_ID, []*model.Parameter{}, "success tag", "fail tag", "from tag", "", false, false)
 			Convey("Then we get back a successful response", func() {
 				So(err, ShouldBeNil)
 				So(code, ShouldEqual, http.StatusCreated)
@@ -176,7 +176,7 @@ func TestGetAllTests(t *testing.T) {
 	Convey("Given that we have created an additional test", t, func() {
 		So(SY_AUTHTOKEN, ShouldNotBeNil)
 		So(SY_AUTHTOKEN, ShouldNotBeEmpty)
-		id, code, err := apiClient.CreateTest(SY_AUTHTOKEN, ts.URL, TEST2_NAME, TEST2_DESC, nil, TEST2_TYPE, "provider type", "provider name", "provider test", PROJECT_WITH_TESTS_SAVED_ID, []*model.Parameter{}, "success tag", "fail tag", "from tag")
+		id, code, err := apiClient.CreateTest(SY_AUTHTOKEN, ts.URL, TEST2_NAME, TEST2_DESC, nil, TEST2_TYPE, "provider type", "provider name", "provider test", PROJECT_WITH_TESTS_SAVED_ID, []*model.Parameter{}, "success tag", "fail tag", "from tag", "", false, false)
 		TEST2_SAVED_ID = id
 		So(err, ShouldBeNil)
 		So(id, ShouldNotBeEmpty)
@@ -234,7 +234,7 @@ func TestGetAllTests(t *testing.T) {
 func TestUpdateTest(t *testing.T) {
 	Convey("Given that we have a test created already.", t, func() {
 		Convey("When we request to update that test.", func() {
-			code, err := apiClient.UpdateTest(SY_AUTHTOKEN, ts.URL, TEST1_SAVED_ID, TEST1_NAME2, TEST1_DESC2, nil, TEST1_TYPE2, PROJECT_WITH_TESTS_SAVED_ID, "provider type", "provider name", "provider test", []*model.Parameter{}, "success tag", "fail tag", "from tag")
+			code, err := apiClient.UpdateTest(SY_AUTHTOKEN, ts.URL, TEST1_SAVED_ID, TEST1_NAME2, TEST1_DESC2, nil, TEST1_TYPE2, PROJECT_WITH_TESTS_SAVED_ID, "provider type", "provider name", "provider test", []*model.Parameter{}, "success tag", "fail tag", "from tag", "registryName", true, false)
 			Convey("Then we get an appropriate response back", func() {
 				So(err, ShouldBeNil)
 				So(code, ShouldEqual, http.StatusNoContent)
@@ -335,7 +335,7 @@ func TestUnauthorizedTestRequests(t *testing.T) {
 	})
 	Convey("Given that we have an empty token", t, func() {
 		Convey("When we request to create a new Test", func() {
-			id, code, err := apiClient.CreateTest("", ts.URL, TEST1_NAME, TEST1_DESC, nil, TEST1_TYPE, "provider type", "provider name", "provider test", PROJECT_WITH_TESTS_SAVED_ID, []*model.Parameter{}, "success tag", "fail tag", "from tag")
+			id, code, err := apiClient.CreateTest("", ts.URL, TEST1_NAME, TEST1_DESC, nil, TEST1_TYPE, "provider type", "provider name", "provider test", PROJECT_WITH_TESTS_SAVED_ID, []*model.Parameter{}, "success tag", "fail tag", "from tag", "", false, false)
 
 			Convey("Then we should be denied access", func() {
 				So(err, ShouldNotBeNil)
