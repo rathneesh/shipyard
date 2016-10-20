@@ -5,12 +5,12 @@ import (
 )
 
 const (
-	BuildStartActionLabel = "start"
-	BuildStatusNewLabel = "new"
-	BuildStatusInProgress = "in_progress"
-	BuildStatusStopped = "stopped"
+	BuildStartActionLabel      = "start"
+	BuildStatusNewLabel        = "new"
+	BuildStatusInProgress      = "in_progress"
+	BuildStatusStopped         = "stopped"
 	BuildStatusFinishedSuccess = "finished_success"
-	BuildStatusFinishedFailed = "finished_failed"
+	BuildStatusFinishedFailed  = "finished_failed"
 )
 
 type Build struct {
@@ -22,7 +22,15 @@ type Build struct {
 	Results   []*BuildResult `json:"results,omitempty" gorethink:"results,omitempty"`
 	TestId    string         `json:"testId" gorethink:"testId"`
 	ProjectId string         `json:"projectId" gorethink:"projectId"`
+	RunLevel  Level          `json:"runLevel" gorethink:"runLevel"`
 }
+
+type Level string
+
+const (
+	ple Level = "project level execution"
+	tle Level = "test level execution"
+)
 
 func (b *Build) NewBuild(config *BuildConfig, status *BuildStatus, results []*BuildResult, testId string, projectId string) *Build {
 
