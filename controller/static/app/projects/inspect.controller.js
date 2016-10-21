@@ -28,10 +28,15 @@
         });
 
         vm.showProjectHistory = showProjectHistory;
+        vm.showTestHistory = showTestHistory;
+        vm.showTestResults = showTestResults;
+        vm.closeModal = closeModal;
         vm.testResults = testResults;
         vm.startRefresh = startRefresh;
         vm.cancelRefresh = cancelRefresh;
 
+        vm.selectedId = null;
+        vm.selectedTestName = null;
         vm.results = resolvedResults;
         vm.proj = ProjectService.getProjectByID(vm.results.projectId);
 
@@ -47,6 +52,11 @@
             ;
         }
 
+        function showTestHistory() {
+            $('#inspect-test-history-' + vm.results.projectId)
+                .sidebar('toggle')
+            ;
+        }
         function testResults(projectId, testId, buildId) {
             return ProjectService.buildResults(projectId, testId, buildId)
                 .then(function(data) {
@@ -81,5 +91,19 @@
                 timer=undefined;
             }
         }
+
+        function showTestResults(id, name) {
+            vm.selectedId = id;
+            vm.selectedTestName = name;
+            $('#inspect-test-history-' + vm.results.projectId)
+                .sidebar('toggle');
+
+            $(".ui.fullscreen.modal.transition.view.results").modal('show');
+        }
+
+        function closeModal() {
+            $(".ui.fullscreen.modal.transition.view.results").modal('hide');
+        }
+
     }
 })();
