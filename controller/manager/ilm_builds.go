@@ -83,6 +83,7 @@ func (m DefaultManager) GetBuildResults(projectId string, testId string, buildId
 }
 
 func (m DefaultManager) GetBuildResultsTable(projectId string, testId string, buildId string, imageId string) (model.Artifact, map[string]map[string][]model.BuildVulnerability, string, error) {
+	// Get the build object by id
 	build, err := m.GetBuildById(buildId)
 
 	var result []string
@@ -105,22 +106,13 @@ func (m DefaultManager) GetBuildResultsTable(projectId string, testId string, bu
 			break
 		}
 	}
-	
-	var layer string
-	lastFeature := "starting value"
+
 	vulnerabilities := map[string]map[string][]model.BuildVulnerability{}
 	for _, resultLine := range result {
 		if strings.Contains(resultLine, "DB is being updated so no query to it can be done") {
 			return art, nil, resultLine, nil
 		} else if strings.HasPrefix(resultLine, "No features were found in image") {
 			return art, nil, result[len(result)-2] + ", which typically means that the image is not supported by Clair.", nil
-		} else if strings.HasPrefix(resultLine, "Successfully analyzed layer") {
-			layer = strings.Split(strings.TrimLeft(resultLine, "Successfully analyzed layer: ")," using")[0]
-			vulnerabilities[layer] = map[string][]model.BuildVulnerability{}
-		} else if strings.HasPrefix(resultLine, "Found feature: ") {
-			lastFeature = strings.Split(strings.TrimLeft(resultLine, "Found feature: "), ", version")[0]
-			layer = strings.Split(resultLine, ", added by: ")[1]
-			vulnerabilities[layer][lastFeature] = []model.BuildVulnerability{}
 		} else 	if (strings.Contains(resultLine, ",High,") || strings.Contains(resultLine, ",Medium,") || strings.Contains(resultLine, ",Low,") || strings.Contains(resultLine, ",Negligible,") || strings.Contains(resultLine, ",Unknown,")) {
 			splitString := strings.Split(resultLine, ",")
 			vulnerability := model.BuildVulnerability{}
@@ -136,6 +128,11 @@ func (m DefaultManager) GetBuildResultsTable(projectId string, testId string, bu
 			for i := 7; i < len(splitString)-2; i++ {
 				vulnerability.VulDescription = vulnerability.VulDescription+","+splitString[i]
 			}
+
+			if len(vulnerabilities[vulnerability.FeatureAddedBy])==0{
+				vulnerabilities[vulnerability.FeatureAddedBy] = map[string][]model.BuildVulnerability{}
+			}
+
 			vulnerabilities[vulnerability.FeatureAddedBy][vulnerability.FeatureName+","+vulnerability.FeatureVersion] = append(vulnerabilities[vulnerability.FeatureAddedBy][vulnerability.FeatureName+","+vulnerability.FeatureVersion], vulnerability)
 		}
 	}
