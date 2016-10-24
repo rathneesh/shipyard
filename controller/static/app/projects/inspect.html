@@ -9,7 +9,7 @@
     </a>
     <div class="item">
         <div class="column" style="overflow-y:scroll; height: 550px">
-        <div class="active item">
+            <div class="active item" ng-repeat="results in vm.projLevTests = (vm.results.testResults | filter: 'project level execution')" jquery>
             <i class="circle icon" ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'grey' : 'red'"></i>{{vm.results.buildId}}
         </div>
         </div>
@@ -29,7 +29,7 @@
                 {{vm.proj.$$state.value.name}}
             </h4>
         </a>
-        <div class="active item" ng-repeat="test in vm.results.testResults | unique: 'buildId'" value={{test.buildId}}"
+        <div class="active item" ng-repeat="test in vm.results.testResults | unique: 'buildId' | filter: '!project level execution' " value={{test.buildId}}"
              jquery>
             <i class="circle icon"
                ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'grey' : 'red'"></i>

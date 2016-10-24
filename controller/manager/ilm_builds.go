@@ -364,7 +364,8 @@ func (m DefaultManager) executeBuildTask(
 					appliedTag,
 				},
 			},
-			Blocker: false,
+			RunLevel: build.RunLevel,
+			Blocker:  false,
 		}
 
 		// TODO: need to revisit API spec, there are just too many redundant "Result" types stored,

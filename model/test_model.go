@@ -153,6 +153,7 @@ type TestResult struct {
 	TestName      string `json:"testName" gorethink:"testName"`
 	Blocker       bool   `json:"blocker" gorethink:"blocker"`
 	SimpleResult
+	RunLevel string `json:"runLevel" gorethink:"runLevel"`
 }
 
 func NewTestResult(
@@ -168,6 +169,7 @@ func NewTestResult(
 	endDate time.Time,
 	appliedTag []string,
 	action *types.Object,
+	runLevel string,
 ) *TestResult {
 	testResult := new(TestResult)
 	testResult.ImageId = imageId
@@ -183,6 +185,6 @@ func NewTestResult(
 	testResult.EndDate = endDate
 	testResult.AppliedTag = appliedTag
 	testResult.Action = action
-
+	testResult.RunLevel = runLevel
 	return testResult
 }
