@@ -109,7 +109,7 @@ func (a *Api) createBuild(w http.ResponseWriter, r *http.Request) {
 	//this needs to be removed before going to production
 	action = "start"
 	buildAction := model.NewBuildAction(action)
-	buildId, err := a.manager.CreateBuild(projId, testId, buildAction, nil)
+	buildId, err := a.manager.CreateBuild(projId, testId, "", buildAction, nil)
 	if err != nil {
 		log.Errorf("error creating build: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)

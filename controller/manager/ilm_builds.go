@@ -101,7 +101,7 @@ func (m DefaultManager) CreateAllBuilds(projectId string, WsEmmitter *emitter.Em
 
 		projectStatus := model.BuildStatusFinishedSuccess
 		for _, test := range project.Tests {
-			m.CreateBuild(projectId, test.ID, model.NewBuildAction(model.BuildStartActionLabel), sync)
+			m.CreateBuild(projectId, test.ID, model.ProjectLevelExecution, model.NewBuildAction(model.BuildStartActionLabel), sync)
 			if <-sync == model.BuildStatusFinishedFailed {
 				projectStatus = model.BuildStatusFinishedFailed
 			}
@@ -121,6 +121,7 @@ func (m DefaultManager) CreateAllBuilds(projectId string, WsEmmitter *emitter.Em
 func (m DefaultManager) CreateBuild(
 	projectId string,
 	testId string,
+	runLevel string,
 	buildAction *model.BuildAction,
 	report chan string,
 ) (string, error) {
@@ -144,7 +145,7 @@ func (m DefaultManager) CreateBuild(
 	build.TestId = testId
 	build.ProjectId = projectId
 	build.StartTime = time.Now()
-
+	build.RunLevel = runLevel
 	// we change the build's buildStatus to submitted
 	build.Status = &model.BuildStatus{Status: model.BuildStatusNewLabel}
 
