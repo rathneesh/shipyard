@@ -89,7 +89,8 @@ var sy = {
     inspectViewBuilds: by.repeater('test in vm.results.testResults'),
     inspectViewTestName: by.id('inspect-view-test-name'),
     inspectViewMagnifyingGlass: by.id('inspect-view-test-results'),
-    inspectProjectGoToProjectsButton: by.id('inspect-go-to-projects')
+    inspectProjectGoToProjectsButton: by.id('inspect-go-to-projects'),
+    buildResults : by.repeater('results in vm.results.testResults')
 };
 
 describe('ILM', function() {
@@ -412,6 +413,25 @@ describe('ILM', function() {
         /*element(by.id('history-project-inspect-view')).click();
          expect(element(by.id('history-header-inspect-view')).isDisplayed()).toBeTruthy();*/
     });
+
+    it('should be able to check the new project history', function() {
+        console.log("check project history");
+        browser.wait(protractor.ExpectedConditions.visibilityOf(element(by.id('history-project-inspect-view')).isDisplayed(), 60000));
+        expect(element(by.id('history-project-inspect-view')).isDisplayed()).toBeTruthy();
+        browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.showProjectHistory)), 60000);
+        expect(element(by.id('inspect-project-history-'+vm.results.projectId)).isDisplayed()).toBeTruthy();
+
+        /*element(by.id('history-project-inspect-view')).click();
+         expect(element(by.id('history-header-inspect-view')).isDisplayed()).toBeTruthy();*/
+    });
+
+    it('should be able to check the test history', function() {
+        console.log("check test history");
+        expect(element(by.id('history-test-inspect-view')).isDisplayed()).toBeTruthy();
+        element(by.id('history-test-inspect-view')).click();
+        expect(element(by.id('history-header-inspect-view')).isDisplayed()).toBeTruthy();
+    });
+
 
     it('should have the build we just ran', function() {
         console.log("check the build that we ran");

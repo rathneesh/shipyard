@@ -9,7 +9,7 @@
     </a>
     <div class="item">
         <div class="column" style="overflow-y:scroll; height: 550px">
-            <div class="active item" ng-repeat="results in vm.projLevTests = (vm.results.testResults | filter: 'project level execution')" jquery>
+            <div class="active item" ng-repeat="results in vm.projLevTests = (vm.results.testResults | unique: 'buildId' | filter: 'project level execution')" jquery>
                 <i class="circle icon" ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'grey' : 'red'"></i>
                 <div>
                     <a ng-click="vm.showProjectLevelExecutedBuilds(results.buildId, results.testName)"
