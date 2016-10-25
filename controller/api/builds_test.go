@@ -250,7 +250,7 @@ func TestCreateNewBuild(t *testing.T) {
 		So(SY_AUTHTOKEN, ShouldNotBeNil)
 		So(SY_AUTHTOKEN, ShouldNotBeEmpty)
 		Convey("When we make a request to create a new build", func() {
-			id, code, err := apiClient.CreateBuild(SY_AUTHTOKEN, ts.URL, BUILD1_CONFIG, BUILD_STATUS_NEW, BUILD1_RESULTS, TEST_ID, PROJECT_ID, nil)
+			id, code, err := apiClient.CreateBuild(SY_AUTHTOKEN, ts.URL, BUILD1_CONFIG, BUILD_STATUS_NEW, BUILD1_RESULTS, TEST_ID, PROJECT_ID, "", nil)
 			Convey("Then we get back a successful response", func() {
 				So(id, ShouldNotBeEmpty)
 				So(code, ShouldEqual, http.StatusCreated)
@@ -319,7 +319,7 @@ func TestGetAllBuilds(t *testing.T) {
 	Convey("Given that we have created an additional build", t, func() {
 		So(SY_AUTHTOKEN, ShouldNotBeNil)
 		So(SY_AUTHTOKEN, ShouldNotBeEmpty)
-		id, code, err := apiClient.CreateBuild(SY_AUTHTOKEN, ts.URL, BUILD2_CONFIG, BUILD_STATUS_NEW, BUILD2_RESULTS, TEST_ID, PROJECT_ID, nil)
+		id, code, err := apiClient.CreateBuild(SY_AUTHTOKEN, ts.URL, BUILD2_CONFIG, BUILD_STATUS_NEW, BUILD2_RESULTS, TEST_ID, PROJECT_ID, "", nil)
 
 		BUILD2_SAVED_ID = id
 
@@ -342,12 +342,14 @@ func TestGetAllBuilds(t *testing.T) {
 							So(build.ProjectId, ShouldEqual, PROJECT_ID)
 							So(build.TestId, ShouldEqual, TEST_ID)
 							So(build.Status, ShouldNotResemble, BUILD_STATUS_FINISHED_FAILURE)
+							So(build.RunLevel, ShouldResemble, "")
 							found_build1 = true
 						}
 						if build.ID == BUILD2_SAVED_ID {
 							So(build.ProjectId, ShouldEqual, PROJECT_ID)
 							So(build.TestId, ShouldEqual, TEST_ID)
 							So(build.Status, ShouldResemble, BUILD_STATUS_RUNNING)
+							So(build.RunLevel, ShouldResemble, "")
 							found_build2 = true
 						}
 					}
@@ -559,7 +561,7 @@ func TestMultiImageBuild(t *testing.T) {
 		So(SY_AUTHTOKEN, ShouldNotBeNil)
 		So(SY_AUTHTOKEN, ShouldNotBeEmpty)
 		Convey("When we make a request to create a new build", func() {
-			id, code, err := apiClient.CreateBuild(SY_AUTHTOKEN, ts.URL, build_config, BUILD_STATUS_NEW, BUILD1_RESULTS, testId, projectId, nil)
+			id, code, err := apiClient.CreateBuild(SY_AUTHTOKEN, ts.URL, build_config, BUILD_STATUS_NEW, BUILD1_RESULTS, testId, projectId, "", nil)
 			Convey("Then we get back a successful response", func() {
 				So(id, ShouldNotBeEmpty)
 				So(code, ShouldEqual, http.StatusCreated)
@@ -596,6 +598,7 @@ func TestMultiImageBuild(t *testing.T) {
 				So(build.ProjectId, ShouldEqual, projectId)
 				So(build.TestId, ShouldEqual, testId)
 				So(build.Status, ShouldResemble, BUILD_STATUS_FINISHED_FAILURE)
+				So(build.RunLevel, ShouldResemble, "")
 			})
 		})
 

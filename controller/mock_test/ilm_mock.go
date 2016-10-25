@@ -110,7 +110,7 @@ func (m MockManager) UpdateBuildResults(buildId string, results []*model.BuildRe
 func (m MockManager) VerifyIfImageExistsLocally(image model.Image) bool {
 	return false
 }
-func (m MockManager) CreateBuild(projectId string, testId string, buildAction *model.BuildAction, report chan string) (string, error) {
+func (m MockManager) CreateBuild(projectId string, testId string, runLevel string, buildAction *model.BuildAction, report chan string) (string, error) {
 	return "", nil
 }
 func (m MockManager) CreateAllBuilds(projectId string, WsEmmitter *emitter.Emitter) (string, error) {

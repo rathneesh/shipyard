@@ -420,9 +420,6 @@ describe('ILM', function() {
         expect(element(by.id('history-project-inspect-view')).isDisplayed()).toBeTruthy();
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.showProjectHistory)), 60000);
         expect(element(by.id('inspect-project-history-'+vm.results.projectId)).isDisplayed()).toBeTruthy();
-
-        /*element(by.id('history-project-inspect-view')).click();
-         expect(element(by.id('history-header-inspect-view')).isDisplayed()).toBeTruthy();*/
     });
 
     it('should be able to check the test history', function() {

@@ -104,12 +104,13 @@ func (a *Api) createBuild(w http.ResponseWriter, r *http.Request) {
 	projId := vars["projectId"]
 	testId := vars["testId"]
 	action := vars["action"]
+	runLevel := vars["runLevel"]
 	var buildId string
 	//hardcode action to start, temporarily
 	//this needs to be removed before going to production
 	action = "start"
 	buildAction := model.NewBuildAction(action)
-	buildId, err := a.manager.CreateBuild(projId, testId, "", buildAction, nil)
+	buildId, err := a.manager.CreateBuild(projId, testId, runLevel, buildAction, nil)
 	if err != nil {
 		log.Errorf("error creating build: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
