@@ -10,7 +10,13 @@
     <div class="item">
         <div class="column" style="overflow-y:scroll; height: 550px">
             <div class="active item" ng-repeat="results in vm.projLevTests = (vm.results.testResults | filter: 'project level execution')" jquery>
-            <i class="circle icon" ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'grey' : 'red'"></i>{{vm.results.buildId}}
+                <i class="circle icon" ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'grey' : 'red'"></i>
+                <div>
+                    <a ng-click="vm.showProjectLevelExecutedBuilds(results.buildId, results.testName)"
+                       style=":hover;text-decoration: underline; cursor: pointer">
+                        {{results.buildId | limitTo:20}}
+                    </a>
+                </div>
         </div>
         </div>
     </div>
@@ -19,35 +25,38 @@
 <div class="pusher">
     <!-- Site content !-->
 </div>
-<div>
-    <div id="inspect-test-history-{{vm.results.projectId}}" class="ui blue vertical demo sidebar menu">
-        <a class="item" style="background-color: #006E93">
-            <h4 class="ui header" style="color: white"><i class="clock icon"></i>Test History For:</h4>
-            <h4 class="ui header" style="color: white">
-                <i class="circle icon"
-                   ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'grey' : 'red'"></i>
-                {{vm.proj.$$state.value.name}}
-            </h4>
-        </a>
-        <div class="active item" ng-repeat="test in vm.results.testResults | unique: 'buildId' | filter: '!project level execution' " value={{test.buildId}}"
-             jquery>
+<div id="inspect-test-history-{{vm.results.projectId}}" class="ui blue vertical demo sidebar menu">
+    <a class="item" style="background-color: #006E93">
+        <h4 class="ui header" style="color: white"><i class="clock icon"></i>Test History For:</h4>
+        <h4 class="ui header" style="color: white">
             <i class="circle icon"
                ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'grey' : 'red'"></i>
-
-            <div>
-                <a ng-click="vm.showTestResults(test.buildId, test.testName)"
+            {{vm.proj.$$state.value.name}}
+        </h4>
+    </a>
+    <div class="item">
+        <div class="column" style="overflow-y:scroll; height: 550px">
+            <div class="active item"
+                 ng-repeat="test in vm.results.testResults | unique: 'buildId' | filter: '!project level execution' "
+                 value={{test.buildId}}"
+                 jquery>
+                <i class="circle icon"
+                   ng-class="vm.project.status == 'Published' ? 'green' : vm.project.status == 'Tested' ? 'grey' : 'red'">
+                </i>
+                <div>
+                <a ng-click="vm.showTestLevelExecutedBuilds(test.buildId, test.testName)"
                    style=":hover;text-decoration: underline; cursor: pointer">
                     {{test.buildId | limitTo:20}}
                 </a>
+                </div>
             </div>
         </div>
     </div>
-
+</div>
 
     <!--Leaving pusher in case we need it-->
-    <div class="pusher">
-        <!-- Site content !-->
-    </div>
+<div class="pusher">
+    <!-- Site content !-->
 </div>
 <div class="ui padded grid">
     <div class="row">
@@ -143,6 +152,10 @@
 
                     <div class="column row">
                         <div class="column">
+                            <div id="history-test-inspect-view" ng-click="vm.showTestHistory()"
+                                 class="ui small blue labeled icon button">
+                                <i class="clock icon"></i> Test History
+                            </div>
                             <h3 class="ui header">
                                 <div class="content">
                                     <i class="circle icon"
@@ -150,11 +163,6 @@
                                     Test Results
                                 </div>
                             </h3>
-
-                            <div id="history-test-inspect-view" ng-click="vm.showTestHistory()"
-                                 class="ui small blue labeled icon button">
-                                <i class="clock icon"></i> Test History
-                            </div>
                           </div>
                     </div>
                 </div>
@@ -163,7 +171,7 @@
     </div>
 </div>
 
-<div class="ui fullscreen modal transition view results">
+<div id="view-build-results-modal" class="ui fullscreen modal transition view results">
     <i class="close icon"></i>
     <div class="header" id="create-test-view-header">Build Results for {{vm.selectedTestName}}</div>
     <div class="content">

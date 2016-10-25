@@ -29,12 +29,13 @@
 
         vm.showProjectHistory = showProjectHistory;
         vm.showTestHistory = showTestHistory;
-        vm.showTestResults = showTestResults;
+        vm.showProjectLevelExecutedBuilds = showProjectLevelExecutedBuilds;
+        vm.showTestLevelExecutedBuilds = showTestLevelExecutedBuilds;
         vm.closeModal = closeModal;
         vm.testResults = testResults;
         vm.startRefresh = startRefresh;
         vm.cancelRefresh = cancelRefresh;
-
+        vm.getTestResults = getTestResults;
         vm.selectedId = null;
         vm.selectedTestName = null;
         vm.results = resolvedResults;
@@ -46,16 +47,24 @@
             })
         });
 
+
+        function getTestResults() {
+            ProjectService.results(vm.results.projectId)
+                .then(function (data) {
+                    vm.results = data;
+                });
+        }
+
         function showProjectHistory() {
+            vm.getTestResults();
             $('#inspect-project-history-' + vm.results.projectId)
-                .sidebar('toggle')
-            ;
+                .sidebar('toggle');
         }
 
         function showTestHistory() {
+            vm.getTestResults();
             $('#inspect-test-history-' + vm.results.projectId)
-                .sidebar('toggle')
-            ;
+                .sidebar('toggle');
         }
         function testResults(projectId, testId, buildId) {
             return ProjectService.buildResults(projectId, testId, buildId)
@@ -92,7 +101,16 @@
             }
         }
 
-        function showTestResults(id, name) {
+        function showProjectLevelExecutedBuilds(id, name) {
+            vm.selectedId = id;
+            vm.selectedTestName = name;
+            $('#inspect-project-history-' + vm.results.projectId)
+                .sidebar('toggle');
+
+            $(".ui.fullscreen.modal.transition.view.results").modal('show');
+        }
+
+        function showTestLevelExecutedBuilds(id, name) {
             vm.selectedId = id;
             vm.selectedTestName = name;
             $('#inspect-test-history-' + vm.results.projectId)
