@@ -25,10 +25,10 @@ var (
 const (
 	postLayerURI         = "/v1/layers"
 	getLayerFeaturesURI  = "/v1/layers/%s?vulnerabilities"
-	CLAIR_ENDPOINT       = "http://clair:6060"
 	FILE_SERVER_ENDPOINT = "http://controller:9279"
 	FILE_SERVER_ROOT     = "/tmp/"
 )
+
 
 func StartImageFileServer(fileServerRoot string) {
 	//Setup a simple HTTP server if Clair is not local.
@@ -56,7 +56,7 @@ func CheckImage(image *model.Image) ([]string, bool, error) {
 	StartImageFileServer(FILE_SERVER_ROOT)
 
 	results := []string{}
-	endpoint := CLAIR_ENDPOINT
+	endpoint := os.Getenv("CLAIR_ENDPOINT")
 	imageName := image.PullableName()
 	isSafe := false
 

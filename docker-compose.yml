@@ -30,6 +30,8 @@ services:
 
   controller:
     env_file: .env
+    environment:
+      - CLAIR_ENDPOINT=http://clair:6060
     restart: always
     image: ilmhpe/ilm
     entrypoint: /bin/bash

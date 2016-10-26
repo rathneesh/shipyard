@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: rethinkdb
+  labels:
+    app: ilm-database
+spec:
+  restartPolicy: Never
+  containers:
+  -
+    name: rethinkdb
+    image: rethinkdb:2.3
+    ports:
+      - containerPort: 8080
+      - containerPort: 28015
+      - containerPort: 29015
+    volumeMounts:
+      - mountPath: /var/run/docker-sock
+        name: proxy-storage
+  volumes:
+    -
+      name: proxy-storage
+      hostPath:
+        path: /var/run/docker.sock
+
+
