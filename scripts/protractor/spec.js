@@ -10,6 +10,7 @@ var config = {
     testTagFailure: 'failure',
     testDescription: 'test description',
     testNameEdit: 'Test soninob/soninob',
+    testDescriptionEdit: 'new',
     imageName: 'soninob/soninob',
     tag: 'latest',
     imageDescriptionEdit: 'new image description',
@@ -74,6 +75,7 @@ var sy = {
     editTestHeader: by.id('edit-test-header'),
     editTestApply: by.id('edit-test-apply'),
     editTestDisplayName: by.model('vm.editTest.name'),
+    editTestDescription: by.model('vm.editTest.description'),
     deleteTestHeader: by.id('delete-test-header'),
     deleteTestButton: by.id('delete-test-button'),
     editProjectList: by.repeater('test in vm.tests'),
@@ -213,12 +215,12 @@ describe('ILM', function() {
     it('check tooltip message changes after clicking the disable image verification slider', function() {
         console.log("tooltip message changes after clicking the disable image verification slider");
         browser.actions().mouseMove(element(by.id('help-circle-image-verification'))).perform();
-        browser.sleep(1000);
+        browser.sleep(2000);
         expect(element(by.id('image-verification-disable-tooltip')).isDisplayed()).toBeTruthy();
         expect(element(by.id('image-verification-disable-tooltip')).getText()).toEqual('Click the slider to disable image verification.');
         element(by.id('image-verification-slider')).click();
         browser.actions().mouseMove(element(by.id('help-circle-image-verification'))).perform();
-        browser.sleep(1000);
+        browser.sleep(2000);
         expect(element(by.id('image-verification-enable-tooltip')).isDisplayed()).toBeTruthy();
         expect(element(by.id('image-verification-enable-tooltip')).getText()).toEqual('Click the slider to enable image verification.');
         element(by.id('image-verification-slider')).click();
@@ -346,18 +348,18 @@ describe('ILM', function() {
         console.log("edit test");
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.editProjectList.row(0)), 60000));
         var testDetails = element(sy.editProjectList.row(0));
-        browser.wait(protractor.ExpectedConditions.visibilityOf(testDetails.element(by.css('i[class="pencil icon"]'))), 60000);
+        //browser.wait(protractor.ExpectedConditions.visibilityOf(testDetails.element(by.css('i[class="pencil icon"]'))), 60000);
         testDetails.element(by.css('i[class="pencil icon"]')).click();
         expect(element(sy.editTestHeader).getText()).toEqual(config.testName);
-        element(sy.editTestDisplayName).clear();
-        element(sy.editTestDisplayName).sendKeys(config.testNameEdit);
-        browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.editTestDisplayName).getText(), 60000));
+        element(by.model('vm.editTest.description')).clear();
+        element(by.model('vm.editTest.description')).sendKeys(config.testDescriptionEdit);
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.editTestApply), 60000));
         element(sy.editTestApply).click();
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.editProjectList.row(0)), 60000));
         var testDetails = element(sy.editProjectList.row(0));
         var test = testDetails.all(by.tagName('td'));
-        expect(test.get(1).getText()).toEqual(config.testNameEdit);
+        expect(test.get(1).getText()).toEqual(config.testName);
+        expect(test.get(3).getText()).toEqual(config.testDescriptionEdit);
     });
 
     it('should be able to run the test', function() {
@@ -371,7 +373,7 @@ describe('ILM', function() {
         browser.wait(protractor.ExpectedConditions.visibilityOf($(sy.editProjectLoadingMsgCSS)), 60000);
         // In this case, we expect the test to fail
         browser.wait(protractor.ExpectedConditions.visibilityOf($(sy.editProjectLoadingMsgNegativeCSS)), 600000);
-        // Expect the message to have the `negative` class (sice build will fail)
+        // Expect the message to have the `negative` class (since build will fail)
         expect(element(sy.editProjectLoadingMsg).getAttribute('class')).toBe('ui icon message negative');
     });
 
@@ -383,22 +385,29 @@ describe('ILM', function() {
         inspectButton.element(by.css('i[class="search icon"]')).click();
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.showTestResults)), 60000);
         expect(element(sy.showTestResults).isDisplayed()).toBe(true);
-        expect(element(sy.testResultsHeader).getText()).toEqual('Latest Build Results for ' + config.testNameEdit);
+        expect(element(sy.testResultsHeader).getText()).toEqual('Latest Build Results for ' + config.testName);
         var buildResults = element(sy.latestBuildResults.row(0));
         var res = buildResults.all(by.tagName('td'));
         // Expect the test results to contain the name of the image we tested
         expect(res.get(1).getText()).toEqual(config.imageName + ":latest");
-        element(by.id('close-build-results')).click();
+        element(by.id('close-build-results')).click().then(function(){
+            var testDetails = element(sy.editProjectList.row(0));
+            var test = testDetails.all(by.tagName('td'));
+            expect(test.get(1).getText()).toEqual(config.testName);
+            browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.editProjectGoToProjectsButton), 60000));
+        });
     });
 
     it('should be able return to project listing via the `Go To Projects` icon', function() {
         console.log("return to the project listing using the 'Go To Projects' action item");
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.editProjectGoToProjectsButton), 60000));
         // Click the `Go To Projects` button
-        element(sy.editProjectGoToProjectsButton).click();
-        var projectName = element.all(sy.projectListTableOfProjects).get(-1)
-            .element(by.css('#project-name'));
-        browser.wait(protractor.ExpectedConditions.visibilityOf(projectName, 60000));
+        browser.sleep(2000);
+        element(sy.editProjectGoToProjectsButton).click().then(function(){
+            var projectName = element.all(sy.projectListTableOfProjects).get(-1)
+                .element(by.css('#project-name'));
+            browser.wait(protractor.ExpectedConditions.visibilityOf(projectName, 60000));
+        });
     });
 
     it('should be able to enter the project"s inspect view', function() {
@@ -441,7 +450,7 @@ describe('ILM', function() {
         expect(
             lastBuild.element(sy.inspectViewTestName).getText()
         ).toEqual(
-            config.testNameEdit
+            config.testName
         );
     });
 
@@ -455,11 +464,18 @@ describe('ILM', function() {
 
     it('should be able to execute test from project level', function() {
         console.log("execute test from project level");
-        browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.projectListTableOfProjects.row(0)), 60000));
-        var buildProject = element(sy.projectListTableOfProjects.row(0));
-        buildProject.element(by.className('wrench icon')).click();
-        browser.wait(protractor.ExpectedConditions.visibilityOf(buildProject.element(by.css('i[class="black play icon"]'))), 60000);
-        buildProject.element(by.css('i[class="black play icon"]')).click();
+        browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.editProjectGoToProjectsButton), 60000));
+        element(sy.editProjectGoToProjectsButton).click().then(function(){
+            browser.sleep(4000);
+            browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.projectListTableOfProjects.row(0)), 60000));
+            var buildProject = element(sy.projectListTableOfProjects.row(0));
+            buildProject.element(by.className('wrench icon')).click();
+            browser.wait(protractor.ExpectedConditions.visibilityOf(buildProject.element(by.css('i[class="black play icon"]'))), 60000);
+            buildProject.element(by.css('i[class="black play icon"]')).click().then(function(){
+                browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.projectListTableOfProjects.row(0)), 60000));
+            });
+            browser.sleep(4000);
+        });
         /*browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.buildQueueTable.row(0)), 60000));
         var buildDetails = element(sy.buildQueueTable.row(0));
         var build = buildDetails.all(by.tagName('td'));
@@ -471,10 +487,12 @@ describe('ILM', function() {
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.projectListTableOfProjects.row(0)), 60000));
         var editProject = element(sy.projectListTableOfProjects.row(0));
         browser.wait(protractor.ExpectedConditions.visibilityOf(editProject.element(by.className('wrench icon'))), 60000);
-        editProject.element(by.className('wrench icon')).click();
-        browser.wait(protractor.ExpectedConditions.visibilityOf(editProject.element(by.css('i[class="black edit icon"]'))), 60000);
-        editProject.element(by.css('i[class="black edit icon"]')).click();
-        expect(element(sy.editProjectHeader).getText()).toEqual('Project ' + config.projectNameOnEdit);
+        editProject.element(by.className('wrench icon')).click().then(function(){
+            browser.wait(protractor.ExpectedConditions.visibilityOf(editProject.element(by.css('i[class="black edit icon"]'))), 60000);
+                editProject.element(by.id('edit-project-icon')).click().then(function(){
+                    expect(element(sy.editProjectHeader).getText()).toEqual('Project ' + config.projectNameOnEdit);
+                });
+        });
     });
 
     it('should be able to delete a image', function() {
@@ -483,6 +501,7 @@ describe('ILM', function() {
         var imageDetails = element(sy.createImageList.row(0));
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(by.id('delete-image-icon')), 60000));
         imageDetails.element(by.id('delete-image-icon')).click();
+        browser.sleep(4000);
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.deleteImageHeader), 60000));
         expect(element(sy.deleteImageHeader).getText()).toEqual("Delete Image: "+config.imageName);
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.deleteImageButton), 60000));
@@ -497,7 +516,8 @@ describe('ILM', function() {
         var testDetails = element(sy.editProjectList.row(0));
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(by.id('delete-test-icon')), 60000));
         testDetails.element(by.id('delete-test-icon')).click();
-        expect(element(sy.deleteTestHeader).getText()).toEqual("Delete Test: "+config.testNameEdit);
+        browser.sleep(4000);
+        expect(element(sy.deleteTestHeader).getText()).toEqual("Delete Test: "+config.testName);
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.deleteTestButton), 60000));
         element(sy.deleteTestButton).click();
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.editProjectHeader), 60000));
@@ -506,8 +526,11 @@ describe('ILM', function() {
 
     it('should be able to delete a project', function() {
         console.log("delete project");
+        browser.sleep(4000);
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.editProjectGoToProjectsButton), 60000));
         element(sy.editProjectGoToProjectsButton).click();
+        browser.sleep(4000);
+        browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.projectListTableOfProjects.row(0)), 60000));
         var deleteProject = element(sy.projectListTableOfProjects.row(0));
         browser.wait(protractor.ExpectedConditions.visibilityOf(element(by.className('wrench icon')), 60000));
         deleteProject.element(by.className('wrench icon')).click();
