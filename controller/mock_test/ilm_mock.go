@@ -128,6 +128,10 @@ func (m MockManager) GetBuildResults(projectId string, testId string, buildId st
 	return nil, nil
 }
 
+func (m MockManager) GetBuildResultsTable(projectId string, testId string, buildId string, imageId string) (model.Artifact, map[string]map[string][]model.BuildVulnerability, string, error) {
+	return model.Artifact{}, nil, "", nil
+}
+
 func (m MockManager) GetImage(imageId string) (*model.Image, error) {
 	return nil, nil
 }

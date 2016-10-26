@@ -78,6 +78,36 @@ func (a *Api) getBuildResults(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (a *Api) getBuildResultsTable(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	projectId := vars["projectId"]
+	testId := vars["testId"]
+	buildId := vars["buildId"]
+	imageId := vars["imageId"]
+
+	artifact, buildResults, finalResult, err := a.manager.GetBuildResultsTable(projectId, testId, buildId, imageId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	result := struct {
+		Artifact model.Artifact
+		BuildResults map[string]map[string][]model.BuildVulnerability
+		FinalResults string
+	}{
+		Artifact: artifact,
+		BuildResults: buildResults,
+		FinalResults: finalResult,
+	}
+
+	log.Info("Was able to get results in controller, now trying json marshalling")
+	if err := json.NewEncoder(w).Encode(&result); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func (a *Api) createAllBuilds(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	projId := vars["projectId"]

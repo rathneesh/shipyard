@@ -95,6 +95,35 @@ func GetBuild(authHeader, url, projectId string, testId string, buildId string) 
 	return build, resp.StatusCode, nil
 }
 
+func GetBuildResultsTable(authHeader, url, projectId string, testId string, buildId string, imageId string) (model.Artifact, map[string]map[string][]model.BuildVulnerability, string, int, error) {
+	result := struct {
+		Artifact model.Artifact
+		BuildResults map[string]map[string][]model.BuildVulnerability
+		FinalResults string
+	}{}
+	resp, err := sendRequest(authHeader, "GET", fmt.Sprintf("%s/api/projects/%s/tests/%s/builds/%s/images/%s/resultsTable", url, projectId, testId, buildId, imageId), "")
+	if err != nil {
+		return result.Artifact, result.BuildResults, result.FinalResults, resp.StatusCode, err
+	}
+
+	// If we get an error status code we should not try to unmarshall body, since it will come empty from server.
+	if resp.StatusCode != http.StatusOK {
+		return result.Artifact, result.BuildResults, result.FinalResults, resp.StatusCode, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return result.Artifact, result.BuildResults, result.FinalResults, resp.StatusCode, err
+	}
+
+	err = json.Unmarshal([]byte(body), &result)
+	if err != nil {
+		return result.Artifact, result.BuildResults, result.FinalResults, resp.StatusCode, errors.New("Error, could not unmarshall build body")
+	}
+
+	return result.Artifact, result.BuildResults, result.FinalResults, resp.StatusCode, nil
+}
+
 func DeleteBuild(authHeader, url, projectId string, testId string, buildId string) error {
 	resp, err := sendRequest(authHeader, "DELETE", fmt.Sprintf("%s/api/projects/%s/tests/%s/builds/%s", url, projectId, testId, buildId), "")
 	if err != nil {

@@ -10,6 +10,8 @@ import (
 	"github.com/shipyard/shipyard/model"
 	"github.com/shipyard/shipyard/utils/emitter"
 	"time"
+	"strings"
+	"encoding/json"
 )
 
 type executeBuildTasksResults struct {
@@ -78,6 +80,64 @@ func (m DefaultManager) GetBuildResults(projectId string, testId string, buildId
 	}
 
 	return build.Results, nil
+}
+
+func (m DefaultManager) GetBuildResultsTable(projectId string, testId string, buildId string, imageId string) (model.Artifact, map[string]map[string][]model.BuildVulnerability, string, error) {
+	// Get the build object by id
+	build, err := m.GetBuildById(buildId)
+
+	var result []string
+	art := model.Artifact{}
+
+	if err != nil {
+		log.Errorf("Could not get results for build= %s err= %", buildId, err.Error())
+		return art, nil, "", err
+	}
+
+	for _, res := range build.Results {
+		marshaledBytes := marshalObject(res.TargetArtifact.Artifact)
+		problem := json.Unmarshal(marshaledBytes, &art)
+		if problem != nil {
+			log.Errorf("Could not unmarshal images for build= %s", buildId)
+			return art, nil, "", errors.New("Image not found")
+		}
+		if art.ImageId == imageId {
+			result = res.ResultEntries
+			break
+		}
+	}
+
+	vulnerabilities := map[string]map[string][]model.BuildVulnerability{}
+	for _, resultLine := range result {
+		if strings.Contains(resultLine, "DB is being updated so no query to it can be done") {
+			return art, nil, resultLine, nil
+		} else if strings.HasPrefix(resultLine, "No features were found in image") {
+			return art, nil, result[len(result)-2] + ", which typically means that the image is not supported by Clair.", nil
+		} else 	if (strings.Contains(resultLine, ",High,") || strings.Contains(resultLine, ",Medium,") || strings.Contains(resultLine, ",Low,") || strings.Contains(resultLine, ",Negligible,") || strings.Contains(resultLine, ",Unknown,")) {
+			splitString := strings.Split(resultLine, ",")
+			vulnerability := model.BuildVulnerability{}
+			vulnerability.FeatureName = splitString[0]
+			vulnerability.FeatureVersion = splitString[1]
+			vulnerability.FeatureAddedBy = splitString[2]
+			vulnerability.VulName = splitString[3]
+			vulnerability.VulSeverity = splitString[4]
+			vulnerability.VulLink = splitString[5]
+			vulnerability.VulDescription = splitString[6]
+			vulnerability.VulFixedBy = splitString[len(splitString)-2]
+			vulnerability.VulMetadata = splitString[len(splitString)-1]
+			for i := 7; i < len(splitString)-2; i++ {
+				vulnerability.VulDescription = vulnerability.VulDescription+","+splitString[i]
+			}
+
+			if len(vulnerabilities[vulnerability.FeatureAddedBy])==0{
+				vulnerabilities[vulnerability.FeatureAddedBy] = map[string][]model.BuildVulnerability{}
+			}
+
+			vulnerabilities[vulnerability.FeatureAddedBy][vulnerability.FeatureName+","+vulnerability.FeatureVersion] = append(vulnerabilities[vulnerability.FeatureAddedBy][vulnerability.FeatureName+","+vulnerability.FeatureVersion], vulnerability)
+		}
+	}
+
+	return art, vulnerabilities, result[len(result)-2]+"\n"+result[len(result)-1], nil
 }
 
 func (m DefaultManager) CreateAllBuilds(projectId string, WsEmmitter *emitter.Emitter) (string, error) {

@@ -22,3 +22,16 @@ func NewTargetArtifact(
 		Artifact:     artifact,
 	}
 }
+
+type Artifact struct {
+	Id string
+	Description string
+	IlmTags []string
+	ImageId string
+	Location    string
+	Name string
+	ProjectId string
+	RegistryDomain string
+	RegistryId string
+	Tag string
+}

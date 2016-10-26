@@ -50,6 +50,17 @@
                     });
                 return promise;
             },
+            buildResultsTable: function(projectId, testId, buildId, imageId) {
+                canceller = $q.defer();
+                var promise = $http
+                    .get('/api/projects/' + projectId + '/tests/' + testId + '/builds/' + buildId + '/images/' + imageId + '/resultsTable', {timeout: canceller.promise})
+                    .then(function(response) {
+                        return {
+                            data: response.data,
+                        };
+                    });
+                return promise;
+            },
             cancel: function() {
               canceller.resolve();
             },
