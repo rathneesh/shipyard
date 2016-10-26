@@ -90,7 +90,13 @@ var sy = {
     inspectViewTestName: by.id('inspect-view-test-name'),
     inspectViewMagnifyingGlass: by.id('inspect-view-test-results'),
     inspectProjectGoToProjectsButton: by.id('inspect-go-to-projects'),
-    buildResults : by.repeater('results in vm.results.testResults')
+    buildResults: by.repeater('results in vm.projLevTests = (vm.results.testResults | unique: "buildId" | filter: "project level execution")'),
+    projectHistoryHeader: by.id('project-history-header'),
+    projectNameHeader: by.id('project-name-header'),
+    testHistoryHeader: by.id('test-history-header'),
+    projectName: by.id('project-name'),
+    buildsList: by.repeater('test in vm.filteredImages = (vm.results.testResults | filter: vm.selectedId)'),
+
 };
 
 describe('ILM', function() {
@@ -414,33 +420,30 @@ describe('ILM', function() {
          expect(element(by.id('history-header-inspect-view')).isDisplayed()).toBeTruthy();*/
     });
 
-    it('should be able to check the new project history', function() {
-        console.log("check project history");
-        browser.wait(protractor.ExpectedConditions.visibilityOf(element(by.id('history-project-inspect-view')).isDisplayed(), 60000));
-        expect(element(by.id('history-project-inspect-view')).isDisplayed()).toBeTruthy();
-        browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.showProjectHistory)), 60000);
-        expect(element(by.id('inspect-project-history-'+vm.results.projectId)).isDisplayed()).toBeTruthy();
-    });
-
-    it('should be able to check the test history', function() {
+    it('should be able to check the test history', function () {
         console.log("check test history");
         expect(element(by.id('history-test-inspect-view')).isDisplayed()).toBeTruthy();
         element(by.id('history-test-inspect-view')).click();
-        expect(element(by.id('history-header-inspect-view')).isDisplayed()).toBeTruthy();
+        expect(element(sy.testHistoryHeader).getText()).toEqual('Test History For:');
+        expect(element(sy.projectName).getText()).toEqual('Selenium Project Edited');
     });
 
-
-    it('should have the build we just ran', function() {
+    it('should have the list with the build ids we just ran', function () {
         console.log("check the build that we ran");
-        browser.wait(protractor.ExpectedConditions.visibilityOf(element.all(sy.inspectViewBuilds).get(-1), 60000));
-        // Click the `inspect` button for the project
-        var lastBuild = element.all(sy.inspectViewBuilds).get(-1);
-        expect(
-            lastBuild.element(sy.inspectViewTestName).getText()
-        ).toEqual(
-            config.testNameEdit
-        );
+        browser.wait(protractor.ExpectedConditions.visibilityOf(element.all(sy.buildResults).get(-1), 60000));
+        element(by.id('show-project-level-tests')).click();
+        //open the modal
+        console.log("inspect the latest build results of the test we run");
+        browser.wait(protractor.ExpectedConditions.visibilityOf(element(sy.buildsList.row(0)), 60000));
+        expect(element(by.id('view-build-results-modal')).getText()).toEqual('Latest Build Results for ' + config.testNameEdit);
+        var buildResults = element(sy.buildResults.row(0));
+        var res = buildResults.all(by.tagName('td'));
+        // Expect the test results to contain the name of the image we tested
+        expect(res.get(1).getText()).toEqual(config.imageName + ":latest");
+        element(by.id('close-build-results')).click();
     });
+
+
 
     it('should be able to go to edit view', function() {
         console.log("skip to edit project view");

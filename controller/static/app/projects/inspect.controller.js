@@ -56,7 +56,7 @@
         }
 
         function showProjectHistory() {
-            vm.getTestResults();
+            //vm.getTestResults();
             $('#inspect-project-history-' + vm.results.projectId)
                 .sidebar('toggle');
         }
