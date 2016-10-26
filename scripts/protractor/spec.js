@@ -10,7 +10,7 @@ var config = {
     testTagFailure: 'failure',
     testDescription: 'test description',
     testNameEdit: 'Test soninob/soninob',
-    testDescriptionEdit: 'new',
+    testDescriptionEdit: '',
     imageName: 'soninob/soninob',
     tag: 'latest',
     imageDescriptionEdit: 'new image description',
