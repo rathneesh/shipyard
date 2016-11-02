@@ -33,49 +33,12 @@ spec:
     args: ["-c", "sleep 30 && ./shipyard -D server --rethinkdb-addr $ILM_BACKEND_SERVICE_HOST:8084 -d tcp://localhost:2375"]
     env:
       - name: CLAIR_ENDPOINT
-        value: http://localhost:6060
-
-  -
-    name: clair
-    image: quay.io/eedevops/clair:ilm-v1.0.1
-    ports:
-      - containerPort: 6060
-      - containerPort: 6061
-    volumeMounts:
-      - mountPath: /config
-        name: clair-storage1
-        readOnly: true
-      - mountPath: /tmp
-        name: clair-storage2
-    command: ["/bin/bash"]
-    args: ["-c", "sleep 30 && clair --config=/config/config.yaml"]
-  -
-    name: postgres
-    image: postgres:9.4.5
-    ports:
-      - containerPort: 5432
-        hostPort: 5432
-    volumeMounts:
-      - mountPath: /var/lib/postgresql/data/pgdata
-        name: postgres-storage
-    env:
-      - name: "PGDATA"
-        value: "/var/lib/postgresql/data/pgdata"
-      - name: "POSTGRES_PASSWORD"
-        value: "postgres"
+        value: http://10.0.237.25:6060
+      - name: http_proxy
+        value: http://web-proxy.bbn.hpecorp.net:8080
+      - name: https_proxy
+        value: http://web-proxy.bbn.hpecorp.net:8080
   volumes:
-    -
-      name: postgres-storage
-      hostPath:
-        path: /tmp/postgres
-    -
-      name: clair-storage1
-      hostPath:
-        path: /etc/clair_config
-    -
-      name: clair-storage2
-      hostPath:
-        path: /tmp/clair-data
     -
       name: proxy-storage
       hostPath:

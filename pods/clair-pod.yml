@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: clair
+  labels:
+    app: ilm-clair
+spec:
+  restartPolicy: Never
+  containers:
+    -
+      name: clair
+      image: quay.io/eedevops/clair:ilm-v1.0.1
+      ports:
+        - containerPort: 6060
+        - containerPort: 6061
+      volumeMounts:
+        - mountPath: /config
+          name: clair-storage1
+        - mountPath: /tmp
+          name: clair-storage2
+      command: ["/bin/bash"]
+      args: ["-c", "sleep 30 && clair --config=/config/config.yaml"]
+      env:
+        - name: http_proxy
+          value: http://web-proxy.bbn.hpecorp.net:8080
+        - name: https_proxy
+          value: http://web-proxy.bbn.hpecorp.net:8080
+  volumes:
+    -
+      name: clair-storage1
+      hostPath:
+        path: /etc/clair_config
+    -
+      name: clair-storage2
+      hostPath:
+        path: /tmp/clair-data
