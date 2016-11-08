@@ -103,7 +103,6 @@ var (
 
 	PROJECT_ID  string
 	TEST_ID     string
-	NEW_TEST_ID string
 	PROVIDER_ID string
 
 	IMAGE1_SAVED_ID string

@@ -384,13 +384,13 @@ func (m DefaultManager) executeBuildTask(
 			LastTagApplied: appliedTag,
 		}
 		log.Debug("the build is done so we start pushing images...")
-		if test.PushImagesOnSuccess == true {
+		if test.PushImagesOnSuccess {
 			err = m.pushImagesAfterBuild(imagesBuiltSuccessfully, test.RegistryName)
 			if err != nil {
 				log.Error(err)
 			}
 		}
-		if test.PushImagesOnFailure == true {
+		if test.PushImagesOnFailure {
 			err = m.pushImagesAfterBuild(imagesBuiltFailed, test.RegistryName)
 			if err != nil {
 				log.Error(err)
@@ -556,12 +556,13 @@ func (m DefaultManager) pushImagesAfterBuild(builtImages map[string][]string, re
 			command := "docker tag " + imageName + " " + address + " && docker push " + address
 			log.Printf("executing: %s", command)
 
-			out, err := exec.Command("/bin/sh", "-c", command).Output()
-			log.Printf("Pushing status:....%s", out)
+			out, error := exec.Command("/bin/sh", "-c", command).Output()
+			log.Printf("Pushing status:....%s %s", out, error)
 			if err != nil {
-				return ErrPushFailed
+				err = errors.New("Couldn't push the image" + imageName + "to the registry")
+				return err
 			}
 		}
 	}
-	return err
+	return nil
 }
