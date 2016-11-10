@@ -223,3 +223,8 @@ func (a *Api) deleteTest(w http.ResponseWriter, r *http.Request) {
 	log.Infof("deleted test: id=%s", test.ID)
 	w.WriteHeader(http.StatusNoContent)
 }
+
+func (a *Api) getRegistryInfo(w http.ResponseWriter, r *http.Request) {
+	/*    # GET /api/projects/{projectId}/tests/{testId}/registryInfo*/
+
+}

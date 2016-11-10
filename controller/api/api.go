@@ -8,16 +8,16 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/context"
+	"github.com/gorilla/mux"
 	"github.com/mailgun/oxy/forward"
 	"github.com/shipyard/shipyard/controller/manager"
 	"github.com/shipyard/shipyard/controller/middleware/access"
 	"github.com/shipyard/shipyard/controller/middleware/audit"
 	mAuth "github.com/shipyard/shipyard/controller/middleware/auth"
 	"github.com/shipyard/shipyard/utils/auth"
-	"github.com/shipyard/shipyard/utils/tlsutils"
 	"github.com/shipyard/shipyard/utils/emitter"
+	"github.com/shipyard/shipyard/utils/tlsutils"
 	"golang.org/x/net/websocket"
-	"github.com/gorilla/mux"
 )
 
 type (
@@ -169,6 +169,7 @@ func (a *Api) Setup() (*http.ServeMux, error) {
 	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}", a.getTest).Methods("GET")
 	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}", a.updateTest).Methods("PUT")
 	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}", a.deleteTest).Methods("DELETE")
+	apiRouter.HandleFunc("/api/projects/{projectId}/tests/{testId}/registryInfo", a.getRegistryInfo).Methods("GET")
 
 	//Build Related routes
 	apiRouter.HandleFunc("/api/projects/{projectId}/builds", a.createAllBuilds).Methods("POST")

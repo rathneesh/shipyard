@@ -85,15 +85,18 @@ type Parameter struct {
 	ParamValue []string `json:"paramValue" gorethink:"paramValue"`
 }
 type Test struct {
-	ID               string            `json:"id,omitempty" gorethink:"id,omitempty"`
-	Name             string            `json:"name" gorethink:"name"`
-	Description      string            `json:"description" gorethink:"description"`
-	Targets          []*TargetArtifact `json:"targets" gorethink:"targets"`
-	SelectedTestType string            `json:"selectedTestType" gorethink:"selectedTestType"`
-	Provider         TestProvider      `json:"provider" gorethink:"provider"`
-	Tagging          Tagging           `json:"tagging" gorethink:"tagging"`
-	FromTag          string            `json:"fromTag" gorethink:"fromTag"`
-	Parameters       []*Parameter      `json:"parameters" gorethink:"parameters"`
+	ID                  string            `json:"id,omitempty" gorethink:"id,omitempty"`
+	Name                string            `json:"name" gorethink:"name"`
+	Description         string            `json:"description" gorethink:"description"`
+	Targets             []*TargetArtifact `json:"targets" gorethink:"targets"`
+	SelectedTestType    string            `json:"selectedTestType" gorethink:"selectedTestType"`
+	Provider            TestProvider      `json:"provider" gorethink:"provider"`
+	Tagging             Tagging           `json:"tagging" gorethink:"tagging"`
+	FromTag             string            `json:"fromTag" gorethink:"fromTag"`
+	Parameters          []*Parameter      `json:"parameters" gorethink:"parameters"`
+	RegistryName        string            `json:"registryName" gorethink:"registryName"`
+	PushImagesOnSuccess bool              `json:"pushImagesOnSuccess" gorethink:"pushImagesOnSuccess"`
+	PushImagesOnFailure bool              `json:"pushImagesOnFailure" gorethink:"pushImagesOnFailure"`
 }
 type TestProvider struct {
 	ProviderType string `json:"providerType" gorethink:"providerType"`
@@ -117,6 +120,9 @@ func (t *Test) NewTest(
 	successTag string,
 	failTag string,
 	fromTag string,
+	registryName string,
+	pushImagesOnSuccess bool,
+	pushImagesOnFailure bool,
 ) *Test {
 	test := new(Test)
 
@@ -131,7 +137,9 @@ func (t *Test) NewTest(
 	test.Tagging.OnFailure = failTag
 	test.FromTag = fromTag
 	test.Parameters = parameters
-
+	test.RegistryName = registryName
+	test.PushImagesOnSuccess = pushImagesOnSuccess
+	test.PushImagesOnFailure = pushImagesOnFailure
 	return test
 }
 

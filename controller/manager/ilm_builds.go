@@ -9,6 +9,7 @@ import (
 	apiClient "github.com/shipyard/shipyard/client"
 	"github.com/shipyard/shipyard/model"
 	"github.com/shipyard/shipyard/utils/emitter"
+	"os/exec"
 	"time"
 	"strings"
 	"encoding/json"
@@ -385,14 +386,23 @@ func (m DefaultManager) executeBuildTask(
 		// determine success or failure (values will be added to channel)
 		var finishLabel string
 		var appliedTag string
+		var imagesBuiltSuccessfully = map[string][]string{}
+		var imagesBuiltFailed = map[string][]string{}
+
 		if isSafe && clairErr == nil {
 			log.Debugf("Clair yielded no errors for image %s.", image.PullableName())
 			appliedTag = test.Tagging.OnSuccess
 			finishLabel = model.BuildStatusFinishedSuccess
+
+			imagesBuiltSuccessfully[test.ID] = append(imagesBuiltSuccessfully[test.ID], image.PullableName())
+
 		} else {
 			log.Debugf("Clair yielded error(s) for image %s.", image.PullableName())
 			appliedTag = test.Tagging.OnFailure
 			finishLabel = model.BuildStatusFinishedFailed
+
+			imagesBuiltFailed[test.ID] = append(imagesBuiltFailed[test.ID], image.PullableName())
+
 		}
 
 		log.Debugf("Creating result objects for test %s", test.Name)
@@ -433,7 +443,19 @@ func (m DefaultManager) executeBuildTask(
 			LastUpdate:     time.Now(),
 			LastTagApplied: appliedTag,
 		}
-
+		log.Debug("the build is done so we start pushing images...")
+		if test.PushImagesOnSuccess {
+			err = m.pushImagesAfterBuild(imagesBuiltSuccessfully, test.RegistryName)
+			if err != nil {
+				log.Error(err)
+			}
+		}
+		if test.PushImagesOnFailure {
+			err = m.pushImagesAfterBuild(imagesBuiltFailed, test.RegistryName)
+			if err != nil {
+				log.Error(err)
+			}
+		}
 		log.Debugf("Synchronizing with executeBuildTasks parent goroutine")
 
 		channel <- executeBuildTasksResults{
@@ -582,4 +604,25 @@ func (m DefaultManager) CreateOrUpdateResults(id string, result *model.Result) e
 	}
 
 	return err
+}
+
+func (m DefaultManager) pushImagesAfterBuild(builtImages map[string][]string, registryAddress string) error {
+	var err error
+	for _, images := range builtImages {
+		for _, imageName := range images {
+			log.Printf("image to push is: %s", imageName)
+
+			address := registryAddress + "/" + imageName
+			command := "docker tag " + imageName + " " + address + " && docker push " + address
+			log.Printf("executing: %s", command)
+
+			out, error := exec.Command("/bin/sh", "-c", command).Output()
+			log.Printf("Pushing status:....%s %s", out, error)
+			if err != nil {
+				err = errors.New("Couldn't push the image" + imageName + "to the registry")
+				return err
+			}
+		}
+	}
+	return nil
 }

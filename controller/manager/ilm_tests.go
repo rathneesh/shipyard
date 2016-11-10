@@ -74,17 +74,20 @@ func (m DefaultManager) UpdateTest(test *model.Test) error {
 	// update
 	if rez != nil {
 		updates := map[string]interface{}{
-			"description":      test.Description,
-			"name":             test.Name,
-			"targets":          test.Targets,
-			"selectedTestType": test.SelectedTestType,
-			"ProviderType":     test.Provider.ProviderType,
-			"providerName":     test.Provider.ProviderName,
-			"providerTest":     test.Provider.ProviderTest,
-			"onSuccess":        test.Tagging.OnSuccess,
-			"onFailure":        test.Tagging.OnFailure,
-			"fromTag":          test.FromTag,
-			"parameters":       test.Parameters,
+			"description":         test.Description,
+			"name":                test.Name,
+			"targets":             test.Targets,
+			"selectedTestType":    test.SelectedTestType,
+			"ProviderType":        test.Provider.ProviderType,
+			"providerName":        test.Provider.ProviderName,
+			"providerTest":        test.Provider.ProviderTest,
+			"onSuccess":           test.Tagging.OnSuccess,
+			"onFailure":           test.Tagging.OnFailure,
+			"fromTag":             test.FromTag,
+			"parameters":          test.Parameters,
+			"registryName":        test.RegistryName,
+			"pushImagesOnSuccess": test.PushImagesOnSuccess,
+			"pushImagesOnFailure": test.PushImagesOnFailure,
 		}
 		if _, err := r.Table(tblNameTests).Filter(map[string]string{"id": test.ID}).Update(updates).RunWrite(m.session); err != nil {
 			return err

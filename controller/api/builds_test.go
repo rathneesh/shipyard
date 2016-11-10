@@ -232,8 +232,7 @@ func TestCreateDependenciesForBuilds(t *testing.T) {
 
 		Convey("When we make a request to create a new test", func() {
 
-			id, code, err := apiClient.CreateTest(SY_AUTHTOKEN, ts.URL, TEST1_NAME, TEST1_DESC, TEST_ARTIFACTS, TEST1_TYPE, "provider type", "provider name", "provider test", PROJECT_ID, []*model.Parameter{}, "success tag", "fail tag", "from tag")
-
+			id, code, err := apiClient.CreateTest(SY_AUTHTOKEN, ts.URL, TEST1_NAME, TEST1_DESC, TEST_ARTIFACTS, TEST1_TYPE, "provider type", "provider name", "provider test", PROJECT_ID, []*model.Parameter{}, "success tag", "fail tag", "from tag", "", false, false)
 			Convey("Then we get back a successful response", func() {
 				So(err, ShouldBeNil)
 				So(code, ShouldEqual, http.StatusCreated)
@@ -545,7 +544,7 @@ func TestMultiImageBuild(t *testing.T) {
 	}
 	Convey("When we make a request to create a new test", t, func() {
 
-		id, code, err := apiClient.CreateTest(SY_AUTHTOKEN, ts.URL, TEST1_NAME, TEST1_DESC, TEST_ARTIFACTS2, TEST1_TYPE, "provider type", "provider name", "provider test", projectId, []*model.Parameter{}, "success tag", "fail tag", "from tag")
+		id, code, err := apiClient.CreateTest(SY_AUTHTOKEN, ts.URL, TEST1_NAME, TEST1_DESC, TEST_ARTIFACTS2, TEST1_TYPE, "provider type", "provider name", "provider test", projectId, []*model.Parameter{}, "success tag", "fail tag", "from tag", "", false, false)
 
 		Convey("Then we get back a successful response", func() {
 			So(err, ShouldBeNil)
@@ -610,6 +609,18 @@ func TestMultiImageBuild(t *testing.T) {
 		})
 	})
 }
+
+//TODO Implement the tests for pushing an image to a registry
+//TODO Add tests that check the repositories in a registry
+
+func TestPushOneImageOnRegistryOnSuccess(t *testing.T)            {}
+func TestPushMultipleImagesOnRegistryOnSuccess(t *testing.T)      {}
+func TestPushOneImageOnRegistryOnFailure(t *testing.T)            {}
+func TestPushMultipleImagesOnRegistryOnFailure(t *testing.T)      {}
+func TestPushAllImagesOnRegistryWhenBuildIsFinished(t *testing.T) {}
+func TestUnauthorizedImagePushOnRegistry(t *testing.T)            {}
+func TestPushSameImageOnARegistry(t *testing.T)                   {}
+func TestUpdateTestWithPushOption(t *testing.T)                   {}
 
 // This is a hack to ensure teardown / cleanup after this test suite ends.
 func TestCleanupBuildTests(t *testing.T) {
