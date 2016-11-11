@@ -506,11 +506,45 @@
 
                             </div>
 
-                            <div class="column" style="overflow-y:scroll; height:340px;">
+                            <div class="column">
 
+<!--
                                 <label>&nbsp;</label>
+-->
 
                                 <div class="fields">
+                                    <div class="eleven wide field">
+                                        <br class="nine wide field">
+                                        <label>Registry Name</label>
+                                        <select name="registryName" ng-model=""
+                                                class="ui search fluid dropdown registryName">
+                                            <option value="">Select the registry to push</option>
+                                            <!--
+                                            <selectize config='vm.editTest.selectizeConfig' options='vm.editTest.selectizeItems' ng-model="vm.editTest.selectizeData" ng-change="vm.setTargetsEditTest(vm.editTest.selectizeData)"></selectize>
+                                            -->
+
+                                            <selectize config='vm.editTest.selectizeConfig' options='vm.editTest.selectizeItems' ng-model="vm.editTest.selectizeData" ng-change="vm.setTargetsEditTest(vm.editTest.selectizeData)"></selectize>
+
+                                        </select>
+                                        <br class="nine wide field">
+                                    </div>
+                                    </div>
+
+
+                                <div class="inline fields">
+                                    <div class="field">
+                                        <input type="checkbox" name="pushImagesSuccess">
+                                        <label>Push Images on Success</label>
+                                    </div>
+                                    <div class="field">
+                                        <input type="checkbox" name="pushImagesFailure">
+                                        <label>Push Images on Failure</label>
+                                    </div>
+                                    <br class="nine wide field">
+                                </div>
+
+
+                                <div class="fields" style="overflow-y:scroll; height:150px;">
                                     <div class="seven wide field">
                                         <label>Parameters <i class="blue help circle icon parameters"></i>
                                             <div class="ui popup" style="max-width: 450px;">

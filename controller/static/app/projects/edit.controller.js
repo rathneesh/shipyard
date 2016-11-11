@@ -40,6 +40,7 @@
         var builds = {};
 
         vm.registries = [];
+        vm.registriesName = [];
         vm.images = [];
         vm.shipyardImages = [];
         vm.publicRegistryTags = [];
@@ -110,6 +111,7 @@
         vm.getImages(vm.project.id);
         vm.getTests(vm.project.id);
         vm.isProjectBuilt(vm.project.id);
+        vm.getRegistriesName = getRegistriesName;
 
         vm.randomCreateId = null;
         vm.randomEditId = null;
@@ -941,5 +943,10 @@
                 });
         }
 
+        function getRegistriesName() {
+            angular.forEach(vm.registries, function (registry) {
+                vm.registriesName.push(registry.name)
+            });
+        }
     }
 })();
